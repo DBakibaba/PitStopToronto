@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PitStop.API.Data;
+using PitStop.API.Endpoints;
+using PitStop.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString =
@@ -8,6 +10,9 @@ var connectionString =
 builder.Services.AddDbContext<PitStopDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-var app = builder.Build();
+builder.Services.AddScoped<WashroomService>();
 
+builder.Services.AddHttpClient();
+
+var app = builder.Build();
 app.Run();
