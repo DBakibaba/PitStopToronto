@@ -15,4 +15,7 @@ builder.Services.AddScoped<WashroomService>();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
+app.MapWashroomEndpoints();
+
+
 app.Run();

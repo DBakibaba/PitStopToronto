@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
-using PitStop.API.Models;
 
+namespace PitStop.API.Dtos;
 
 public record TorontoWashroomDto
 (
@@ -21,4 +21,18 @@ public record TorontoWashroomDto
     [property:JsonPropertyName("ACCESSIBLE_FEATURES")]
     string Accessible_Features
 
+);
+
+public record TorontoWashroomResult(
+    [property: JsonPropertyName("records")]
+        List<TorontoWashroomDto> Records
+
+);
+
+public record TorontoWashroomResponse(
+    [property: JsonPropertyName("success")]
+    bool Success,
+
+    [property: JsonPropertyName("result")]
+    TorontoWashroomResult Result
 );
