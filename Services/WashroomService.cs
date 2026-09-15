@@ -1,8 +1,6 @@
 using PitStop.API.Data;
 using Microsoft.EntityFrameworkCore;
 
-
-
 namespace PitStop.API.Services;
 
 public class WashroomService(PitStopDbContext dbContext)
@@ -39,6 +37,13 @@ public class WashroomService(PitStopDbContext dbContext)
                 washroom.IsAccessible
             );
         });
+
+        var nearbyWashrooms = washroomsWithDistance
+        .Where(dto => dto.DistanceKm <= 3)
+        .OrderBy(dto => dto.DistanceKm).ToList();
+
+        return nearbyWashrooms;
+
     }
     private static double CalculateDistanceKm(double userLatitude, double userLongitude, double washroomLatitude, double washroomLongitude)
     {
