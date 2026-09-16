@@ -1,6 +1,7 @@
 using PitStop.API.Data;
 using System.Text.Json;
 using PitStop.API.Dtos;
+using PitStop.API.Models;
 
 namespace PitStop.API.Services;
 
@@ -23,8 +24,49 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
             return;
         }
         var torontoWashrooms = torontoResponse.Result.Records;
+        foreach (var torontoWashroom in torontoWashrooms)
+        {
+            var geometry = JsonSerializer.Deserialize<TorontoGeometryDto>(torontoWashroom.Geometry);
+
+            if (geometry is null)
+            {
+                continue;
+            }
+            var longitude = geometry.Coordinates[0];
+            var latitude = geometry.Coordinates[1];
+
+
+
+            var washroom = new Washroom
+            {
+                Name = torontoWashroom.AssetName.Trim(),
+                Address = torontoWashroom.Address?.Trim(),
+                Latitude = latitude,
+                Longitude = longitude,
+                Source = "Toronto Open Data"
+            };
+        }
     }
 
+    private FacilityStatus MapStatus(string status)
+    {
 
+        switch (status)
+        {
+            case "0":
+                return FacilityStatus.Closed;
+
+            case "1":
+                return FacilityStatus.Open;
+
+            case "2":
+                return FacilityStatus.ServiceAlert;
+            default:
+                return FacilityStatus.ServiceAlert;
+
+
+        }
+
+    }
 
 }

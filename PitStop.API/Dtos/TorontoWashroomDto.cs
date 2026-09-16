@@ -5,9 +5,9 @@ namespace PitStop.API.Dtos;
 public record TorontoWashroomDto
 (
     [property:JsonPropertyName("ASSET_ID")]
-    int Asset_Id,
+    int AssetId,
     [property:JsonPropertyName("AssetName")]
-    string Asset_Name,
+    string AssetName,
     [property:JsonPropertyName("ADDRESS")]
     string? Address,
     [property: JsonPropertyName("Status")]
