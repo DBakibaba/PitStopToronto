@@ -14,5 +14,6 @@ public class Washroom
     public required string Source { get; set; }
     public bool IsActive { get; set; }
     public bool IsAccessible { get; set; }
+    public string? ExternalId { get; set; }
 
 }

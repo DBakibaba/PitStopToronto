@@ -50,6 +50,7 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
 
 
             };
+            dbContext.Washrooms.Add(washroom);
         }
     }
 
