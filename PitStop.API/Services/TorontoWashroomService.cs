@@ -43,7 +43,12 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
                 Address = torontoWashroom.Address?.Trim(),
                 Latitude = latitude,
                 Longitude = longitude,
-                Source = "Toronto Open Data"
+                Status = MapStatus(torontoWashroom.Status),
+                Source = "Toronto Open Data",
+                Hours = torontoWashroom.Hours?.Trim(),
+                Type = MapLocationType(torontoWashroom.Type),
+
+
             };
         }
     }
@@ -69,4 +74,25 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
 
     }
 
+    private LocationType MapLocationType(string type)
+    {
+        switch (type)
+        {
+            case "Washroom Building":
+                return LocationType.PublicWashroom;
+
+            default:
+                return LocationType.PublicWashroom;
+        }
+    }
+
+    private bool MapAccessibility(string accessibleFeatures)
+    {
+        if (accessibleFeatures == "None")
+        {
+            return false;
+
+        }
+        return true;
+    }
 }
