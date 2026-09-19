@@ -19,7 +19,7 @@ public record TorontoWashroomDto
     [property:JsonPropertyName("HOURS")]
     string? Hours,
     [property:JsonPropertyName("ACCESSIBLE_FEATURES")]
-    string Accessible_Features
+    string AccessibleFeatures
 
 );
 

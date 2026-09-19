@@ -47,11 +47,14 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
                 Source = "Toronto Open Data",
                 Hours = torontoWashroom.Hours?.Trim(),
                 Type = MapLocationType(torontoWashroom.Type),
+                IsAccessible = MapAccessibility(torontoWashroom.AccessibleFeatures),
+                ExternalId = torontoWashroom.AssetId.ToString()
 
 
             };
             dbContext.Washrooms.Add(washroom);
         }
+        await dbContext.SaveChangesAsync();
     }
 
     private FacilityStatus MapStatus(string status)
