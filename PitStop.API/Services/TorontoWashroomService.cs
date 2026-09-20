@@ -2,6 +2,7 @@ using PitStop.API.Data;
 using System.Text.Json;
 using PitStop.API.Dtos;
 using PitStop.API.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace PitStop.API.Services;
 
@@ -35,10 +36,17 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
             var longitude = geometry.Coordinates[0];
             var latitude = geometry.Coordinates[1];
 
+            var externalId = torontoWashroom.AssetId.ToString();
+            var existingWashroom = await dbContext.Washrooms
+            .FirstOrDefaultAsync(existing => existing.Source == "Toronto Open Data" && existing.ExternalId == externalId);
 
-
+            if (existingWashroom is not null)
+            {
+                continue;
+            }
             var washroom = new Washroom
             {
+
                 Name = torontoWashroom.AssetName.Trim(),
                 Address = torontoWashroom.Address?.Trim(),
                 Latitude = latitude,
@@ -52,6 +60,7 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
 
 
             };
+
             dbContext.Washrooms.Add(washroom);
         }
         await dbContext.SaveChangesAsync();
