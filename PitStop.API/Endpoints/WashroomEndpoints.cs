@@ -24,5 +24,10 @@ public static class WashroomEndpoints
      return Results.Ok(nearbyWashrooms);
  });
 
+        group.MapPost("/import-toronto", async (TorontoWashroomService torontoWashroomService) =>
+        {
+            await torontoWashroomService.GetTorontoWashroomsAsync();
+            return Results.Ok();
+        });
     }
 }

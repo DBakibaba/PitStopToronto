@@ -11,6 +11,7 @@ builder.Services.AddDbContext<PitStopDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<WashroomService>();
+builder.Services.AddScoped<TorontoWashroomService>();
 
 builder.Services.AddHttpClient();
 

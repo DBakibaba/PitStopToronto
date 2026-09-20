@@ -12,7 +12,7 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
     public async Task GetTorontoWashroomsAsync()
     {
 
-        var response = await httpClient.GetAsync("https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?id=1c7d1063-2562-4de3-8cd3-4cef48419f6f");
+        var response = await httpClient.GetAsync("https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?id=1c7d1063-2562-4de3-8cd3-4cef48419f6f&limit=1000");
 
         response.EnsureSuccessStatusCode();
 
@@ -42,6 +42,16 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
 
             if (existingWashroom is not null)
             {
+                existingWashroom.Status = MapStatus(torontoWashroom.Status);
+                existingWashroom.Address = torontoWashroom.Address?.Trim();
+                existingWashroom.Latitude = latitude;
+                existingWashroom.Longitude = longitude;
+                existingWashroom.Status = MapStatus(torontoWashroom.Status);
+                existingWashroom.Hours = torontoWashroom.Hours?.Trim();
+                existingWashroom.Type = MapLocationType(torontoWashroom.Type);
+                existingWashroom.IsAccessible = MapAccessibility(torontoWashroom.AccessibleFeatures);
+                existingWashroom.IsActive = true;
+
                 continue;
             }
             var washroom = new Washroom
@@ -56,7 +66,9 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
                 Hours = torontoWashroom.Hours?.Trim(),
                 Type = MapLocationType(torontoWashroom.Type),
                 IsAccessible = MapAccessibility(torontoWashroom.AccessibleFeatures),
-                ExternalId = torontoWashroom.AssetId.ToString()
+                ExternalId = torontoWashroom.AssetId.ToString(),
+                IsActive = true,
+
 
 
             };
