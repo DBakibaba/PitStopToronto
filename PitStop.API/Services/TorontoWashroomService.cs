@@ -25,11 +25,18 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
             return (0, 0);
         }
         var torontoWashrooms = torontoResponse.Result.Records;
+        if (torontoWashrooms.Count == 0)
+        {
+            return (0, 0);
+        }
         var importedCount = 0;
         var updatedCount = 0;
         var existingWashrooms = await dbContext.Washrooms
            .Where(existing => existing.Source == "Toronto Open Data").ToListAsync();
-
+        foreach (var washroom in existingWashrooms)
+        {
+            washroom.IsActive = false;
+        }
 
         foreach (var torontoWashroom in torontoWashrooms)
         {
