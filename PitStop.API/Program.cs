@@ -16,7 +16,11 @@ builder.Services.AddScoped<TorontoWashroomService>();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
-app.MapWashroomEndpoints();
 
+app.Environment.IsDevelopment();
 
+if (app.Environment.IsDevelopment())
+{
+    app.MapWashroomEndpoints();
+}
 app.Run();

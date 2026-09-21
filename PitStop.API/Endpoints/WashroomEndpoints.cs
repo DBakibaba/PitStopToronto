@@ -34,16 +34,18 @@ public static class WashroomEndpoints
 
      return Results.Ok(nearbyWashrooms);
  });
-
-        group.MapPost("/import-toronto", async (TorontoWashroomService torontoWashroomService) =>
+        if (app.Environment.IsDevelopment())
         {
-            var result = await torontoWashroomService.GetTorontoWashroomsAsync();
-
-            return Results.Ok(new
+            group.MapPost("/import-toronto", async (TorontoWashroomService torontoWashroomService) =>
             {
-                imported = result.Imported,
-                updated = result.Updated
+                var result = await torontoWashroomService.GetTorontoWashroomsAsync();
+
+                return Results.Ok(new
+                {
+                    imported = result.Imported,
+                    updated = result.Updated
+                });
             });
-        });
+        }
     }
 }
