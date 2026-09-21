@@ -27,6 +27,9 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
         var torontoWashrooms = torontoResponse.Result.Records;
         var importedCount = 0;
         var updatedCount = 0;
+        var existingWashrooms = await dbContext.Washrooms
+           .Where(existing => existing.Source == "Toronto Open Data").ToListAsync();
+
 
         foreach (var torontoWashroom in torontoWashrooms)
         {
@@ -40,8 +43,7 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
             var latitude = geometry.Coordinates[1];
 
             var externalId = torontoWashroom.AssetId.ToString();
-            var existingWashroom = await dbContext.Washrooms
-            .FirstOrDefaultAsync(existing => existing.Source == "Toronto Open Data" && existing.ExternalId == externalId);
+            var existingWashroom = existingWashrooms.FirstOrDefault(washroom => washroom.ExternalId == externalId);
 
             if (existingWashroom is not null)
             {
