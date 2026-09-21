@@ -26,8 +26,13 @@ public static class WashroomEndpoints
 
         group.MapPost("/import-toronto", async (TorontoWashroomService torontoWashroomService) =>
         {
-            await torontoWashroomService.GetTorontoWashroomsAsync();
-            return Results.Ok();
+            var result = await torontoWashroomService.GetTorontoWashroomsAsync();
+
+            return Results.Ok(new
+            {
+                imported = result.Imported,
+                updated = result.Updated
+            });
         });
     }
 }

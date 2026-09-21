@@ -9,7 +9,7 @@ namespace PitStop.API.Services;
 public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbContext)
 {
 
-    public async Task GetTorontoWashroomsAsync()
+    public async Task<(int Imported, int Updated)> GetTorontoWashroomsAsync()
     {
 
         var response = await httpClient.GetAsync("https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?id=1c7d1063-2562-4de3-8cd3-4cef48419f6f&limit=1000");
@@ -22,9 +22,12 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
 
         if (torontoResponse is null)
         {
-            return;
+            return (0, 0);
         }
         var torontoWashrooms = torontoResponse.Result.Records;
+        var importedCount = 0;
+        var updatedCount = 0;
+
         foreach (var torontoWashroom in torontoWashrooms)
         {
             var geometry = JsonSerializer.Deserialize<TorontoGeometryDto>(torontoWashroom.Geometry);
@@ -51,7 +54,7 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
                 existingWashroom.Type = MapLocationType(torontoWashroom.Type);
                 existingWashroom.IsAccessible = MapAccessibility(torontoWashroom.AccessibleFeatures);
                 existingWashroom.IsActive = true;
-
+                updatedCount++;
                 continue;
             }
             var washroom = new Washroom
@@ -74,8 +77,10 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
             };
 
             dbContext.Washrooms.Add(washroom);
+            importedCount++;
         }
         await dbContext.SaveChangesAsync();
+        return (importedCount, updatedCount);
     }
 
     private FacilityStatus MapStatus(string status)
