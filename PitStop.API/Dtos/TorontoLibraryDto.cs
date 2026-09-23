@@ -25,3 +25,18 @@ public record TorontoLibraryDto
     [property: JsonPropertyName("PublicParking")]
     string PublicParking
 );
+
+public record TorontoLibraryResult(
+    [property:JsonPropertyName
+    ("records")]
+        List<TorontoLibraryDto> Records
+);
+
+public record TorontoLibraryResponse(
+    [property:JsonPropertyName
+    ("success")]
+    bool Success,
+
+    [property: JsonPropertyName("result")]
+    TorontoLibraryResult Result
+);
