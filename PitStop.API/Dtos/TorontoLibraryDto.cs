@@ -14,9 +14,11 @@ public record TorontoLibraryDto
     string? Address,
 
     [property: JsonPropertyName("Lat")]
+    [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
     double Latitude,
 
     [property: JsonPropertyName("Long")]
+    [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
     double Longitude,
 
     [property: JsonPropertyName("Hours")]

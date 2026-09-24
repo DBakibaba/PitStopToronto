@@ -46,6 +46,14 @@ public static class WashroomEndpoints
                     updated = result.Updated
                 });
             });
+
+            group.MapPost("/import-library", async (TorontoLibraryService torontoLibraryService) =>
+            {
+                await torontoLibraryService.GetTorontoLibrariesAsync();
+
+                return Results.Ok();
+
+            });
         }
     }
 }
