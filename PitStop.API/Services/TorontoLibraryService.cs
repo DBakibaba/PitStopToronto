@@ -1,8 +1,11 @@
+using Microsoft.EntityFrameworkCore;
 using PitStop.API.Data;
-using System.Text.Json;
 using PitStop.API.Dtos;
 using PitStop.API.Models;
-using Microsoft.EntityFrameworkCore;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Text.Json;
+using System.Xml.Linq;
 
 
 
@@ -36,22 +39,39 @@ public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbCon
         {
             var existingLibrary = existingLibraries.
                 FirstOrDefault(l => l.ExternalId == library.BranchCode);
-            var washroom = new Washroom
+            if (existingLibrary is not null)
             {
+                existingLibrary.Name = library.Name;
+                existingLibrary.Address = library.Address;
+                existingLibrary.Latitude = library.Latitude;
+                existingLibrary.Longitude = library.Longitude;
+                existingLibrary.Hours = library.Hours;
+                existingLibrary.Type = LocationType.Library;
+                existingLibrary.Source = "Toronto Library Data";
+                existingLibrary.ExternalId = library.BranchCode;
+                existingLibrary.IsActive = true;
+                existingLibrary.Status = FacilityStatus.Unknown;
+                existingLibrary.IsAccessible = true;
+                continue;
+            }
+  
+                var washroom = new Washroom
+                {
 
-                Name = library.Name,
-                Address=library.Address,
-                Latitude=library.Latitude,
-                Longitude=library.Longitude,
-                Hours=library.Hours,
-                Type=LocationType.Library,
-                Source="Toronto Library Data",
-                ExternalId=library.BranchCode,
-                IsActive=true,
-                Status=FacilityStatus.Unknown,
-                IsAccessible=true
+                    Name = library.Name,
+                    Address = library.Address,
+                    Latitude = library.Latitude,
+                    Longitude = library.Longitude,
+                    Hours = library.Hours,
+                    Type = LocationType.Library,
+                    Source = "Toronto Library Data",
+                    ExternalId = library.BranchCode,
+                    IsActive = true,
+                    Status = FacilityStatus.Unknown,
+                    IsAccessible = true
 
-            };
+                }; 
+            
 
             dbContext.Washrooms.Add(washroom);
         }

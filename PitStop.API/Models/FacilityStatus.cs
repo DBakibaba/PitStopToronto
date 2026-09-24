@@ -4,5 +4,6 @@ public enum FacilityStatus
 {
     Closed,
     Open,
-    ServiceAlert
+    ServiceAlert,
+    Unknown
 }
