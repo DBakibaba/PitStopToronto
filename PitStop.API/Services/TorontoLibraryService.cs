@@ -28,9 +28,13 @@ public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbCon
             return;
         }
 
+        
+
         var libraries = libraryResponse.Result.Records;
+        Console.WriteLine($"All libraries: {libraries.Count}");
         var librariesWithParking = libraries.
-            Where(l => l.PublicParking != "0").ToList();
+            Where(l => l.PublicParking != "0" && l.Latitude.HasValue && l.Longitude.HasValue).ToList();
+        Console.WriteLine($"Libraries with parking: {librariesWithParking.Count}");
 
         var existingLibraries = await dbContext.Washrooms
             .Where(w => w.Source == "Toronto Library Data").ToListAsync();
@@ -43,8 +47,8 @@ public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbCon
             {
                 existingLibrary.Name = library.Name;
                 existingLibrary.Address = library.Address;
-                existingLibrary.Latitude = library.Latitude;
-                existingLibrary.Longitude = library.Longitude;
+                existingLibrary.Latitude = library.Latitude.Value;
+                existingLibrary.Longitude = library.Longitude.Value;
                 existingLibrary.Hours = library.Hours;
                 existingLibrary.Type = LocationType.Library;
                 existingLibrary.Source = "Toronto Library Data";
@@ -60,8 +64,8 @@ public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbCon
 
                     Name = library.Name,
                     Address = library.Address,
-                    Latitude = library.Latitude,
-                    Longitude = library.Longitude,
+                    Latitude = library.Latitude.Value,
+                    Longitude = library.Longitude.Value,
                     Hours = library.Hours,
                     Type = LocationType.Library,
                     Source = "Toronto Library Data",

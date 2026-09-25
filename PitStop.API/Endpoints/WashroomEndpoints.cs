@@ -11,6 +11,19 @@ public static class WashroomEndpoints
     {
         var group = app.MapGroup("/washrooms");
 
+        group.MapGet("/", async (WashroomService washroomService) => {
+
+            var washrooms = await washroomService.GetAllWashroomsAsync();
+            return Results.Ok(new
+            {
+                Count=washrooms.Count,
+                Washrooms=washrooms
+            });
+
+        });
+        
+        
+        
         group.MapGet("/nearby", async (
             double latitude,
             double longitude,
@@ -34,6 +47,7 @@ public static class WashroomEndpoints
 
      return Results.Ok(nearbyWashrooms);
  });
+        
         if (app.Environment.IsDevelopment())
         {
             group.MapPost("/import-toronto", async (TorontoWashroomService torontoWashroomService) =>

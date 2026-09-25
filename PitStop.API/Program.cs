@@ -12,7 +12,7 @@ builder.Services.AddDbContext<PitStopDbContext>(options =>
 
 builder.Services.AddScoped<WashroomService>();
 builder.Services.AddScoped<TorontoWashroomService>();
-
+builder.Services.AddScoped<TorontoLibraryService>();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();

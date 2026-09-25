@@ -15,11 +15,11 @@ public record TorontoLibraryDto
 
     [property: JsonPropertyName("Lat")]
     [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
-    double Latitude,
+    double? Latitude,
 
     [property: JsonPropertyName("Long")]
     [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
-    double Longitude,
+    double? Longitude,
 
     [property: JsonPropertyName("Hours")]
     string? Hours,
