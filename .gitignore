@@ -480,3 +480,9 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# React / Node
+node_modules/
+dist/
+.env
+.env.local
