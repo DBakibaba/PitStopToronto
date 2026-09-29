@@ -1,10 +1,14 @@
 import {useState} from 'react'
+import WashroomMap from "./components/WashroomMap"
 
 type Washroom={
   id:number
   name:string
   address:string | null
   distanceKm:number
+  latitude:number
+  longitude:number
+  
 }
 
 function App() {
@@ -37,9 +41,14 @@ function App() {
   return(
   <div>
     <h1>PitStop</h1>
+    
+    
+    <WashroomMap>
+ 
+    </WashroomMap>
+    <p>    </p>
     <p>Find a nearby washroom in Toronto</p>
-    <button onClick={loadWashrooms}>Find Washrooms
-    </button>
+    <button onClick={loadWashrooms}>Find Washrooms</button>
     <p>
       Washrooms found: {washrooms.length}</p> {errorMessage && <p>{errorMessage}</p>}
     {washrooms.map(washroom=>(
