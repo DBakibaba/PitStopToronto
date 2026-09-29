@@ -1,15 +1,9 @@
 import {useState} from 'react'
 import WashroomMap from "./components/WashroomMap"
+import type { Washroom } from "./types/Washroom"
+import { Marker } from 'react-leaflet'
 
-type Washroom={
-  id:number
-  name:string
-  address:string | null
-  distanceKm:number
-  latitude:number
-  longitude:number
-  
-}
+
 
 function App() {
   const[washrooms,setWashrooms]=useState<Washroom[]>([])
@@ -43,9 +37,9 @@ function App() {
     <h1>PitStop</h1>
     
     
-    <WashroomMap>
+    <WashroomMap washrooms={washrooms} /> 
  
-    </WashroomMap>
+     
     <p>    </p>
     <p>Find a nearby washroom in Toronto</p>
     <button onClick={loadWashrooms}>Find Washrooms</button>

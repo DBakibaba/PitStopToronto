@@ -1,9 +1,15 @@
-import { MapContainer, TileLayer } from "react-leaflet"
+import { MapContainer, TileLayer,Marker } from "react-leaflet"
+import type { Washroom } from "../types/Washroom"
 import "leaflet/dist/leaflet.css"
+import { marker } from "leaflet"
 
+type WashroomMapProps={
+    washrooms:Washroom[]
+
+}
 
     
-function WashroomMap(){
+function WashroomMap({washrooms}:WashroomMapProps){
         return(
             <MapContainer 
                 center={[43.6532,-79.3832]} 
@@ -12,6 +18,12 @@ function WashroomMap(){
                 >
                 <TileLayer  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
+                {washrooms.map(washroom=>(
+                    <Marker 
+                        key={washroom.id}
+                        position={[washroom.latitude,washroom.longitude]}
+                />
+                ))}
             </MapContainer>
         
         )
