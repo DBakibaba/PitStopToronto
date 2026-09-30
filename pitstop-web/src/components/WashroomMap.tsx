@@ -1,7 +1,8 @@
-import { MapContainer, TileLayer,Marker } from "react-leaflet"
+import { MapContainer, TileLayer,Marker,Popup} from "react-leaflet"
 import type { Washroom } from "../types/Washroom"
 import "leaflet/dist/leaflet.css"
 import { marker } from "leaflet"
+
 
 type WashroomMapProps={
     washrooms:Washroom[]
@@ -22,7 +23,14 @@ function WashroomMap({washrooms}:WashroomMapProps){
                     <Marker 
                         key={washroom.id}
                         position={[washroom.latitude,washroom.longitude]}
-                />
+                >
+                    <Popup>
+                        <h3>{washroom.name}</h3>
+                        <p>{washroom.address}</p>
+                        <p>{washroom.distanceKm.toFixed(2)} km away </p>
+                    </Popup>
+                    
+                    </Marker>
                 ))}
             </MapContainer>
         
