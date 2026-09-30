@@ -2,6 +2,7 @@ import { MapContainer, TileLayer,Marker,Popup,useMap} from "react-leaflet"
 import type { Washroom } from "../types/Washroom"
 import "leaflet/dist/leaflet.css"
 import { marker } from "leaflet"
+import { useEffect } from "react"
 
 
 type WashroomMapProps={
@@ -17,9 +18,13 @@ type MapControllerProps={
 
 function MapController({latitude,longitude}:MapControllerProps){
     const map = useMap()
-    if(latitude !==null && longitude !==null){
-        map.setView([latitude,longitude],13)
+    useEffect(()=>{
+
+        if(latitude !==null && longitude !==null){
+                map.setView([latitude,longitude],13)
     }
+    },[latitude,longitude,map])
+    
     return null       
 }
     
