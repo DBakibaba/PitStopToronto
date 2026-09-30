@@ -7,16 +7,21 @@ import { Marker } from 'react-leaflet'
 
 function App() {
   const[washrooms,setWashrooms]=useState<Washroom[]>([])
-  const [errorMessage,setErrorMessage]=useState<string>("")
+  const[errorMessage,setErrorMessage]=useState<string>("")
+  const[latitude,setLatitude]=useState<number | null>(null)
+  const[longitude,setLongitude]=useState<number | null>(null)
 
   async function loadWashrooms() {
      
     navigator.geolocation.getCurrentPosition(
     async(position) => {
-      const latitude=position.coords.latitude
-      const longitude=position.coords.longitude
+      const lat=position.coords.latitude
+      const long=position.coords.longitude
+
+      setLatitude(lat)
+      setLongitude(long)
        
-      const response=await fetch(`http://localhost:5042/washrooms/nearby?latitude=${latitude}&longitude=${longitude}`)
+      const response=await fetch(`http://localhost:5042/washrooms/nearby?latitude=${lat}&longitude=${long}`)
 
       const data=await response.json()
       setWashrooms(data)},
@@ -37,7 +42,10 @@ function App() {
     <h1>PitStop</h1>
     
     
-    <WashroomMap washrooms={washrooms} /> 
+    <WashroomMap 
+    washrooms={washrooms} 
+    latitude={latitude}
+    longitude={longitude}/> 
  
      
     <p>    </p>
