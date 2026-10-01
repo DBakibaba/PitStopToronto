@@ -1,7 +1,7 @@
-import { MapContainer, TileLayer,Marker,Popup,useMap} from "react-leaflet"
+import { MapContainer, TileLayer,Marker,Popup,useMap,CircleMarker} from "react-leaflet"
 import type { Washroom } from "../types/Washroom"
 import "leaflet/dist/leaflet.css"
-import { marker } from "leaflet"
+ 
 import { useEffect } from "react"
 
 
@@ -39,7 +39,7 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
          
                 center={MapCenter}
                 zoom={13}
-                style={{ height:"500px", width:"100x"}}
+                style={{ height:"500px", width:"100%"}}
                
                 >
                 <MapController  
@@ -51,6 +51,12 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
 
                 <TileLayer  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
+                {latitude !==null && longitude !== null &&(
+                    <CircleMarker    
+                        center={[latitude,longitude]} radius={10}>
+                    </CircleMarker>
+                )}
+
                 {washrooms.map(washroom=>(
                     <Marker 
                         key={washroom.id}

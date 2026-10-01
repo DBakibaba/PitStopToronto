@@ -1,7 +1,7 @@
 import {useState} from 'react'
 import WashroomMap from "./components/WashroomMap"
 import type { Washroom } from "./types/Washroom"
-import { Marker } from 'react-leaflet'
+
 
 
 
@@ -33,7 +33,7 @@ function App() {
       
   })
 
-  const [errorMessage,setErrorMessage]=useState<string>("")
+  
 }
 
 
