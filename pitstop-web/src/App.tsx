@@ -17,6 +17,7 @@ function App() {
     async(position) => {
       const lat=position.coords.latitude
       const long=position.coords.longitude
+      console.log("Browser location: ",lat,long)
 
       setLatitude(lat)
       setLongitude(long)

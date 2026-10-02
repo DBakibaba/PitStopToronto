@@ -32,6 +32,16 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
        
     const MapCenter= latitude !==null && longitude !==null 
                 ? [latitude,longitude] :  [43.6532,-79.3832]
+
+    function openGoogleMaps(lat:number,long:number,wcLat:number,wcLong:number){
+        const baseUrl="https://www.google.com/maps/dir/?api=1"
+        const origin= `&origin=${lat},${long}`
+        const destination = `&destination=${wcLat},${wcLong}`
+        const travelMode = "&travelmode=driving"; 
+
+        window.open(baseUrl + origin  + destination + travelMode, '_blank')
+
+    }
                 
                 
     return(
@@ -66,6 +76,10 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                         <h3>{washroom.name}</h3>
                         <p>{washroom.address}</p>
                         <p>{washroom.distanceKm.toFixed(2)} km away </p>
+                        <button onClick={()=>openGoogleMaps(latitude,longitude,washroom.latitude,washroom.longitude)}  
+                            > Get Direction
+
+                        </button>
                     </Popup>
                     
                     </Marker>
