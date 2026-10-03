@@ -7,4 +7,6 @@ public class PitStopDbContext(DbContextOptions<PitStopDbContext> options)
     : DbContext(options)
 {
     public DbSet<Washroom> Washrooms => Set<Washroom>();
+    public DbSet<WashroomOperatingHour> OperatingHours => Set<WashroomOperatingHour>();
+
 }
