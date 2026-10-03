@@ -5,5 +5,8 @@ export type Washroom={
   distanceKm:number
   latitude:number
   longitude:number
+  hours:string | null
+  publicParking:string
+  isAccessible:boolean
   
 }

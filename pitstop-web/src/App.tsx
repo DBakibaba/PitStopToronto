@@ -59,6 +59,8 @@ function App() {
         <h3>{washroom.name}</h3>
         <p>{washroom.address}</p>
         <p>{washroom.distanceKm.toFixed(2)} km away</p>
+        <p>{washroom.hours}</p>
+        <p>{washroom.publicParking}</p>
       </div>
     ))}
   </div>

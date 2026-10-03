@@ -16,4 +16,7 @@ public class Washroom
     public bool IsAccessible { get; set; }
     public string? ExternalId { get; set; }
 
+    public ICollection<WashroomOperatingHour> OperatingHours { get; set; } 
+        = new List<WashroomOperatingHour>();
+
 }
