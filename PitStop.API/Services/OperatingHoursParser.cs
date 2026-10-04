@@ -1,4 +1,7 @@
-﻿namespace PitStop.API.Services
+﻿using Microsoft.EntityFrameworkCore;
+using PitStop.API.Models;
+
+namespace PitStop.API.Services
 {
     public class OperatingHoursParser
     {
@@ -8,35 +11,68 @@
             {
                 case "Mon":
                     return DayOfWeek.Monday;
-                    break;
 
                 case "Tue":
                     return DayOfWeek.Tuesday;
-                    break;
 
                 case "Wed":
                     return DayOfWeek.Wednesday;
-                    break;
 
                 case "Thu":
                     return DayOfWeek.Thursday;
-                    break;
 
                 case "Fri":
                     return DayOfWeek.Friday;
-                    break;
 
                 case "Sat":
                     return DayOfWeek.Saturday;
-                    break;
 
                 case "Sun":
                     return DayOfWeek.Sunday;
-                    break;
-
+     
             }
             throw new ArgumentException($"Unknown day:{day}");
 
+        }
+        public TimeOnly ParseTime(string time)
+        {
+            var normalizedTime = time.Replace("a.m", "AM").Replace("p.m", "PM");
+            return TimeOnly.Parse(normalizedTime);
+        }
+        public List<WashroomOperatingHour> Parse(string? hours)
+        {
+            List<WashroomOperatingHour> operatingHours = new List<WashroomOperatingHour>();
+            if(hours == null)
+            {
+                return operatingHours;
+            }
+
+            var parts = hours.Split(';');
+            foreach(var part in parts)
+            {
+                var dayHour = part.Trim();
+                string[] splitHours = dayHour.Split(' ');
+                
+                DayOfWeek day = ParseDay(splitHours[0]);
+
+                string openTimeText = $"{splitHours[1] + " " + splitHours[2]}" ;
+                string closeTimeText = $"{splitHours[4] + " " + splitHours[5]}";
+
+                TimeOnly openTime = ParseTime(openTimeText);
+                TimeOnly closeTime = ParseTime(closeTimeText);
+
+                var operatingHour = new WashroomOperatingHour()
+                {
+
+                    DayOfWeek = day,
+                    OpenTime = openTime,
+                    CloseTime = closeTime,
+                    IsClosed = false
+
+                };
+                operatingHours.Add(operatingHour);
+            }
+            return operatingHours;
         }
     }
 }

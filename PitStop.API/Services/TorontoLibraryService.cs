@@ -11,7 +11,7 @@ using System.Xml.Linq;
 
 namespace PitStop.API.Services;
 
-public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbContext)
+public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbContext,OperatingHoursParser operatingHoursParser)
 {
 
     public async Task GetTorontoLibrariesAsync()
@@ -36,7 +36,7 @@ public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbCon
             Where(l => l.PublicParking != "0" && l.Latitude.HasValue && l.Longitude.HasValue).ToList();
         Console.WriteLine($"Libraries with parking: {librariesWithParking.Count}");
 
-        var existingLibraries = await dbContext.Washrooms
+        var existingLibraries = await dbContext.Washrooms.Include(w=>w.OperatingHours)
             .Where(w => w.Source == "Toronto Library Data").ToListAsync();
 
        foreach(var library in librariesWithParking)
@@ -56,6 +56,10 @@ public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbCon
                 existingLibrary.IsActive = true;
                 existingLibrary.Status = FacilityStatus.Unknown;
                 existingLibrary.IsAccessible = true;
+                dbContext.OperatingHours.RemoveRange(existingLibrary.OperatingHours);
+                var newOperatingHours=operatingHoursParser.Parse(library.Hours);
+                existingLibrary.OperatingHours = newOperatingHours;
+
                 continue;
             }
   
@@ -72,7 +76,8 @@ public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbCon
                     ExternalId = library.BranchCode,
                     IsActive = true,
                     Status = FacilityStatus.Unknown,
-                    IsAccessible = true
+                    IsAccessible = true,
+                    OperatingHours = operatingHoursParser.Parse(library.Hours),
 
                 }; 
             

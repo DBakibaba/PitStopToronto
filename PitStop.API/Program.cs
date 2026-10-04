@@ -17,6 +17,7 @@ builder.Services.AddScoped<WashroomService>();
 builder.Services.AddScoped<TorontoWashroomService>();
 builder.Services.AddScoped<TorontoLibraryService>();
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<OperatingHoursParser>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
@@ -38,4 +39,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
+var parser = new OperatingHoursParser();
+var testTime = parser.ParseTime("8:30 a.m");
+Console.WriteLine(testTime);
 app.Run();

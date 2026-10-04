@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public int WashroomId { get; set; }
-        public required Washroom Washroom { get; set; }
+        public  Washroom? Washroom { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
 
         public TimeOnly? OpenTime { get; set; }
