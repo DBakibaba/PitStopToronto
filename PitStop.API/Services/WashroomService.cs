@@ -10,7 +10,7 @@ public class WashroomService(PitStopDbContext dbContext)
     public async Task<List<Washroom>> GetAllWashroomsAsync()
     {
 
-        return await dbContext.Washrooms.ToListAsync();
+        return await dbContext.Washrooms.Include(w=>w.OperatingHours).ToListAsync();
 
     }
     public async Task<List<NearbyWashroomDto>> GetNearByAsync(double latitude, double longitude)

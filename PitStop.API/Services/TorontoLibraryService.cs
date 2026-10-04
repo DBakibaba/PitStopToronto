@@ -43,6 +43,11 @@ public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbCon
         {
             var existingLibrary = existingLibraries.
                 FirstOrDefault(l => l.ExternalId == library.BranchCode);
+            if(!library.Latitude.HasValue || !library.Longitude.HasValue)
+            {
+                continue;
+
+            }
             if (existingLibrary is not null)
             {
                 existingLibrary.Name = library.Name;
