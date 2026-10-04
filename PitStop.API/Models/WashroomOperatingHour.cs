@@ -1,9 +1,12 @@
-﻿namespace PitStop.API.Models
+﻿using System.Text.Json.Serialization;
+
+namespace PitStop.API.Models
 {
     public class WashroomOperatingHour
     {
         public int Id { get; set; }
         public int WashroomId { get; set; }
+        [JsonIgnore]
         public  Washroom? Washroom { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
 

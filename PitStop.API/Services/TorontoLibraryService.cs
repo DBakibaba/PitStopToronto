@@ -31,10 +31,8 @@ public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbCon
         
 
         var libraries = libraryResponse.Result.Records;
-        Console.WriteLine($"All libraries: {libraries.Count}");
         var librariesWithParking = libraries.
-            Where(l => l.PublicParking != "0" && l.Latitude.HasValue && l.Longitude.HasValue).ToList();
-        Console.WriteLine($"Libraries with parking: {librariesWithParking.Count}");
+            Where(l => l.PublicParking != "0" && l.Latitude.HasValue && l.Longitude.HasValue && l.Name !="Sunnybrook Hospital").ToList();
 
         var existingLibraries = await dbContext.Washrooms.Include(w=>w.OperatingHours)
             .Where(w => w.Source == "Toronto Library Data").ToListAsync();
@@ -62,7 +60,9 @@ public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbCon
                 existingLibrary.Status = FacilityStatus.Unknown;
                 existingLibrary.IsAccessible = true;
                 dbContext.OperatingHours.RemoveRange(existingLibrary.OperatingHours);
+                
                 var newOperatingHours=operatingHoursParser.Parse(library.Hours);
+               
                 existingLibrary.OperatingHours = newOperatingHours;
 
                 continue;
@@ -89,6 +89,8 @@ public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbCon
 
             dbContext.Washrooms.Add(washroom);
         }
+
+
         await dbContext.SaveChangesAsync();
 
 

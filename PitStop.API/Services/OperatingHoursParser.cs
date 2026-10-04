@@ -42,7 +42,7 @@ namespace PitStop.API.Services
         public List<WashroomOperatingHour> Parse(string? hours)
         {
             List<WashroomOperatingHour> operatingHours = new List<WashroomOperatingHour>();
-            if(hours == null)
+            if(hours == null || hours== "Closed")
             {
                 return operatingHours;
             }
@@ -52,8 +52,23 @@ namespace PitStop.API.Services
             {
                 var dayHour = part.Trim();
                 string[] splitHours = dayHour.Split(' ');
-                
                 DayOfWeek day = ParseDay(splitHours[0]);
+                if (splitHours[1]=="Closed")
+                {
+                    var exceptionOperatingHour = new WashroomOperatingHour()
+                    {
+                        DayOfWeek = day,
+                        OpenTime = null,
+                        CloseTime = null,
+                        IsClosed = true
+
+                    };
+                    operatingHours.Add(exceptionOperatingHour);
+
+                    continue;
+                }
+                
+                
 
                 string openTimeText = $"{splitHours[1] + " " + splitHours[2]}" ;
                 string closeTimeText = $"{splitHours[4] + " " + splitHours[5]}";

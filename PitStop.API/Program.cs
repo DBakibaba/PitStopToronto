@@ -39,15 +39,6 @@ if (app.Environment.IsDevelopment())
 }
 
 
-var parser = new OperatingHoursParser();
-var testHours ="Mon 9 a.m. to 8:30 p.m.; Tue 9 a.m. to 8:30 p.m.";
-var hours=parser.Parse(testHours);
 
-foreach (var hour in hours)
-{
-    Console.WriteLine(
-        $"{hour.DayOfWeek}: {hour.OpenTime} - {hour.CloseTime}"
-    );
-}
 
 app.Run();
