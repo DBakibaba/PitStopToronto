@@ -8,5 +8,16 @@ export type Washroom={
   hours:string | null
   publicParking:string
   isAccessible:boolean
+  operatingHour:OperatingHour[]
   
+  
+}
+
+export type OperatingHour={
+  id:number
+  washroomId:number
+  dayOfWeek:number  
+  openTime:string | null
+  closeTime:string  | null
+  isClosed:boolean
 }

@@ -74,8 +74,17 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                 >
                     <Popup>
                         <h3>{washroom.name}</h3>
+                         
                         <p>{washroom.address}</p>
                         <p>{washroom.distanceKm.toFixed(2)} km away </p>
+                        <p>Hours:{washroom.hours}</p>
+                        
+                        {washroom.operatingHour.map((operatingHours)=>(
+                        <p key={operatingHours.id}> {operatingHours.dayOfWeek} - {operatingHours.openTime} - {operatingHours.closeTime}
+                        
+                        </p>
+                    ))}
+
                         <button onClick={()=>openGoogleMaps(latitude,longitude,washroom.latitude,washroom.longitude)}  
                             > Get Direction
 
