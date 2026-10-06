@@ -8,7 +8,7 @@ export type Washroom={
   hours:string | null
   publicParking:string
   isAccessible:boolean
-  operatingHour:OperatingHour[]
+  operatingHours:OperatingHour[]
   
   
 }

@@ -16,6 +16,18 @@ type MapControllerProps={
      longitude:number | null
 }
 
+const today=new Date().getDay()
+
+const dayNames=[
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+]
+
 function MapController({latitude,longitude}:MapControllerProps){
     const map = useMap()
     useEffect(()=>{
@@ -67,7 +79,14 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                     </CircleMarker>
                 )}
 
-                {washrooms.map(washroom=>(
+                {washrooms.map(washroom => {
+
+                            const todayOperatingHour = washroom.operatingHours.find(
+                                operatingHour => operatingHour.dayOfWeek === today
+                            )
+
+                    return (
+
                     <Marker 
                         key={washroom.id}
                         position={[washroom.latitude,washroom.longitude]}
@@ -77,13 +96,9 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                          
                         <p>{washroom.address}</p>
                         <p>{washroom.distanceKm.toFixed(2)} km away </p>
-                        <p>Hours:{washroom.hours}</p>
+                         
+                        <p>{todayOperatingHour ? (todayOperatingHour.openTime,todayOperatingHour.closeTime) : (washroom.hours)}</p>
                         
-                        {washroom.operatingHour.map((operatingHours)=>(
-                        <p key={operatingHours.id}> {operatingHours.dayOfWeek} - {operatingHours.openTime} - {operatingHours.closeTime}
-                        
-                        </p>
-                    ))}
 
                         <button onClick={()=>openGoogleMaps(latitude,longitude,washroom.latitude,washroom.longitude)}  
                             > Get Direction
@@ -91,8 +106,9 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                         </button>
                     </Popup>
                     
-                    </Marker>
-                ))}
+                   </Marker>
+            )
+    })}
             </MapContainer>
         
         )
