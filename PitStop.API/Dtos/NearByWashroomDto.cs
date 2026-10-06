@@ -12,5 +12,6 @@ public record NearbyWashroomDto(
     LocationType Type,
     FacilityStatus Status,
     string? Hours,
-    bool IsAccessible
+    bool IsAccessible,
+    List<WashroomOperatingHour> OperatingHours 
 );

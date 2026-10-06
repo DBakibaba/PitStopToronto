@@ -27,6 +27,24 @@ const dayNames=[
     "Friday",
     "Saturday"
 ]
+function formatTime(time: string | null) : string {
+
+    if(time === null){
+        return ""
+    }
+    const[hour,minute] = time.split(":")
+    const hourNumber=Number(hour)
+    const period=hourNumber >=12? "PM" : "AM"
+    let displayHour=hourNumber
+    if (hourNumber >12){
+        displayHour=hourNumber-12
+    }
+    if(hourNumber ===0){
+        displayHour=12
+    }
+
+    return `${displayHour}:${minute} ${period}`
+}
 
 function MapController({latitude,longitude}:MapControllerProps){
     const map = useMap()
@@ -97,7 +115,8 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                         <p>{washroom.address}</p>
                         <p>{washroom.distanceKm.toFixed(2)} km away </p>
                          
-                        <p>{todayOperatingHour ? (todayOperatingHour.openTime,todayOperatingHour.closeTime) : (washroom.hours)}</p>
+                        <p>{todayOperatingHour? `${formatTime(todayOperatingHour.openTime)} - ${formatTime(todayOperatingHour.closeTime)}` : washroom.hours
+    }</p>
                         
 
                         <button onClick={()=>openGoogleMaps(latitude,longitude,washroom.latitude,washroom.longitude)}  

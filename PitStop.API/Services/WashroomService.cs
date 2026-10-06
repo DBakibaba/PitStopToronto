@@ -15,7 +15,7 @@ public class WashroomService(PitStopDbContext dbContext)
     }
     public async Task<List<NearbyWashroomDto>> GetNearByAsync(double latitude, double longitude)
     {
-        var activeWashrooms = await dbContext.Washrooms.Where(washroom => washroom.IsActive).ToListAsync();
+        var activeWashrooms = await dbContext.Washrooms.Where(washroom => washroom.IsActive).Include(w=>w.OperatingHours).ToListAsync();
 
         var washroomsWithDistance = activeWashrooms.Select(washroom =>
         {
@@ -36,7 +36,8 @@ public class WashroomService(PitStopDbContext dbContext)
                 washroom.Type,
                 washroom.Status,
                 washroom.Hours,
-                washroom.IsAccessible
+                washroom.IsAccessible,
+                washroom.OperatingHours.ToList()
             );
         });
 
