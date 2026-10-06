@@ -46,6 +46,31 @@ function formatTime(time: string | null) : string {
     return `${displayHour}:${minute} ${period}`
 }
 
+function isOpenNow(openTime:string | null ,closeTime:string | null) : boolean {
+
+    if(openTime===null || closeTime===null){
+        return false
+    }
+    const now=new Date()
+    const [openHour, openMinute] = openTime.split(":")
+    const openHourNum = Number(openHour)
+    const openMinuteNum = Number(openMinute)
+
+    const [closeHour, closeMinute] = closeTime.split(":")
+    const closeHourNum=Number(closeHour)
+    const closeMinuteNum=Number(closeMinute)
+
+    const sumOpenMinuteNum=openHourNum*60+openMinuteNum
+    const sumCloseMinuteNum=closeHourNum*60 + closeMinuteNum
+
+    const currentMinutes=now.getHours()*60 + now.getMinutes()
+
+   
+    return currentMinutes >= sumOpenMinuteNum && currentMinutes < sumCloseMinuteNum
+
+}
+
+
 function MapController({latitude,longitude}:MapControllerProps){
     const map = useMap()
     useEffect(()=>{
@@ -102,7 +127,27 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                             const todayOperatingHour = washroom.operatingHours.find(
                                 operatingHour => operatingHour.dayOfWeek === today
                             )
+                            let hoursText=washroom.hours
+                            console.log("START:", washroom.name, hoursText)
 
+                            if(todayOperatingHour !=null){
+                                 
+                                if(todayOperatingHour.isClosed){
+                                    hoursText="Closed today"
+                                    
+                                }else{
+                                     const result=isOpenNow(todayOperatingHour.openTime,todayOperatingHour.closeTime)
+                                     if(result===true){
+                                            hoursText=`Open until ${formatTime(todayOperatingHour.closeTime)}`
+                                     }else{
+                                        hoursText="Closed today"
+                                     }
+                                      
+                                    
+                                }
+                                 
+                            }
+                               
                     return (
 
                     <Marker 
@@ -115,8 +160,12 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                         <p>{washroom.address}</p>
                         <p>{washroom.distanceKm.toFixed(2)} km away </p>
                          
-                        <p>{todayOperatingHour? `${formatTime(todayOperatingHour.openTime)} - ${formatTime(todayOperatingHour.closeTime)}` : washroom.hours
-    }</p>
+                        {/* <p>{todayOperatingHour? `${formatTime(todayOperatingHour.openTime)} - ${formatTime(todayOperatingHour.closeTime)}` : washroom.hours }
+
+                        </p> */}
+
+                        <p> Hours:{hoursText}</p>
+
                         
 
                         <button onClick={()=>openGoogleMaps(latitude,longitude,washroom.latitude,washroom.longitude)}  
