@@ -15,9 +15,11 @@ public class WashroomService(PitStopDbContext dbContext)
     }
     public async Task<List<NearbyWashroomDto>> GetNearByAsync(double latitude, double longitude)
     {
-        var activeWashrooms = await dbContext.Washrooms.Where(washroom => washroom.IsActive).Include(w=>w.OperatingHours).ToListAsync();
+        var activeWashrooms = await dbContext.Washrooms.Where(washroom => washroom.IsActive).Include(washroom => washroom.OperatingHours).ToListAsync();
 
-        var washroomsWithDistance = activeWashrooms.Select(washroom =>
+        var availableWashrooms = activeWashrooms.Where(washroom => IsAvailableNow(washroom));
+
+        var washroomsWithDistance = availableWashrooms.Select(washroom =>
         {
             var distance = CalculateDistanceKm(
              latitude, longitude,
@@ -47,6 +49,35 @@ public class WashroomService(PitStopDbContext dbContext)
 
         return nearbyWashrooms;
 
+    }
+    private bool IsAvailableNow(Washroom washroom)
+    {
+        if (washroom.OperatingHours.Count == 0)
+        {
+            return true;
+        }
+        DayOfWeek today = DateTime.Now.DayOfWeek;
+        var todayOperatingHour = washroom.OperatingHours.FirstOrDefault(operatingHour => operatingHour.DayOfWeek == today);
+
+        if(todayOperatingHour == null )
+        {
+            return true;
+        }
+        if (todayOperatingHour.IsClosed == true)
+        {
+            return false;
+        }
+        
+        
+            TimeOnly currentTime = TimeOnly.FromDateTime(DateTime.Now);
+
+        if(currentTime>=todayOperatingHour.OpenTime && currentTime <= todayOperatingHour.CloseTime)
+        {
+            return true;
+        }
+
+        return false; 
+        
     }
     private static double CalculateDistanceKm(double userLatitude, double userLongitude, double washroomLatitude, double washroomLongitude)
     {

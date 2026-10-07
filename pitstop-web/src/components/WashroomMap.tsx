@@ -160,9 +160,7 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                         <p>{washroom.address}</p>
                         <p>{washroom.distanceKm.toFixed(2)} km away </p>
                          
-                        {/* <p>{todayOperatingHour? `${formatTime(todayOperatingHour.openTime)} - ${formatTime(todayOperatingHour.closeTime)}` : washroom.hours }
-
-                        </p> */}
+                      
 
                         <p> Hours:{hoursText}</p>
 

@@ -11,7 +11,8 @@ using System.Xml.Linq;
 
 namespace PitStop.API.Services;
 
-public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbContext,OperatingHoursParser operatingHoursParser)
+public class TorontoLibraryService(HttpClient httpClient, PitStopDbContext dbContext,
+    OperatingHoursParser operatingHoursParser)
 {
 
     public async Task GetTorontoLibrariesAsync()
