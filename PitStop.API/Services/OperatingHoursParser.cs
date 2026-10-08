@@ -41,15 +41,32 @@ namespace PitStop.API.Services
         }
 
 
-        public List<WashroomOperatingHour>ParseDailyHours(string hours)
+        public List<WashroomOperatingHour>ParseDailyHours(string? hours)
         {
+
+            List<WashroomOperatingHour> operatingHours = new List<WashroomOperatingHour>();
+
+            if (string.IsNullOrWhiteSpace(hours))
+            {
+                return operatingHours;
+            }
+
+
             var parts = hours.Split(" to ");
-            TimeOnly openTime =ParseTime(parts[0]);
-            TimeOnly closeTime =ParseTime(parts[1]);
 
+            if (parts.Length != 2)
+            {
+                return operatingHours;
+            }
 
+            string openingText = parts[0].Replace("a.m.", "AM").Replace("p.m.", "PM");
+            string closingText = parts[1].Replace("a.m.", "AM").Replace("p.m.", "PM");
 
-            List < WashroomOperatingHour > operatingHours= new List<WashroomOperatingHour>();
+            if (!TimeOnly.TryParse(openingText, out TimeOnly openTime) ||
+                !TimeOnly.TryParse(closingText, out TimeOnly closeTime))
+            {
+                return operatingHours;
+            }
 
             foreach(DayOfWeek day in Enum.GetValues<DayOfWeek>())
             {

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace PitStop.API.Services;
 
-public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbContext)
+public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbContext,OperatingHoursParser operatingHoursParser)
 {
 
     public async Task<(int Imported, int Updated)> GetTorontoWashroomsAsync()
@@ -31,7 +31,7 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
         }
         var importedCount = 0;
         var updatedCount = 0;
-        var existingWashrooms = await dbContext.Washrooms
+        var existingWashrooms = await dbContext.Washrooms.Include(w=>w.OperatingHours)
            .Where(existing => existing.Source == "Toronto Open Data").ToListAsync();
         foreach (var washroom in existingWashrooms)
         {
@@ -54,7 +54,7 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
 
             if (existingWashroom is not null)
             {
-                existingWashroom.Status = MapStatus(torontoWashroom.Status);
+               
                 existingWashroom.Address = torontoWashroom.Address?.Trim();
                 existingWashroom.Latitude = latitude;
                 existingWashroom.Longitude = longitude;
@@ -63,7 +63,36 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
                 existingWashroom.Type = MapLocationType(torontoWashroom.Type);
                 existingWashroom.IsAccessible = MapAccessibility(torontoWashroom.AccessibleFeatures);
                 existingWashroom.IsActive = true;
+                dbContext.OperatingHours.RemoveRange(existingWashroom.OperatingHours);
+
+                List<WashroomOperatingHour> newOperatingHours = new();
+
+                string? incomingHours = torontoWashroom.Hours?.Trim();
+
+
+                if (!string.IsNullOrWhiteSpace(incomingHours))
+                {
+                    var parts = incomingHours.Split(" to ");
+
+                    if (parts.Length == 2 && TimeOnly.TryParse(parts[0].Replace("a.m.", "AM").Replace("p.m.", "PM"), out _) 
+                        &&
+                        TimeOnly.TryParse( parts[1].Replace("a.m.", "AM").Replace("p.m.", "PM"),out _))
+                    {
+                        newOperatingHours = operatingHoursParser.ParseDailyHours(incomingHours);
+                    }
+                }
+
+                existingWashroom.Hours = incomingHours;
+                existingWashroom.OperatingHours = newOperatingHours;
+                if (existingWashroom.Id == 1)
+                {
+                    Console.WriteLine(
+                        $"Washroom {existingWashroom.Id}: Hours='{incomingHours}', Parsed={newOperatingHours.Count}, Assigned={existingWashroom.OperatingHours.Count}");
+                }
+
                 updatedCount++;
+
+
                 continue;
             }
             var washroom = new Washroom
@@ -80,6 +109,8 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
                 IsAccessible = MapAccessibility(torontoWashroom.AccessibleFeatures),
                 ExternalId = torontoWashroom.AssetId.ToString(),
                 IsActive = true,
+                OperatingHours = operatingHoursParser.ParseDailyHours(torontoWashroom.Hours),
+
 
 
 
@@ -89,6 +120,7 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
             importedCount++;
         }
         await dbContext.SaveChangesAsync();
+        Console.WriteLine("Toronto washroom import: SaveChangesAsync completed.");
         return (importedCount, updatedCount);
     }
 
