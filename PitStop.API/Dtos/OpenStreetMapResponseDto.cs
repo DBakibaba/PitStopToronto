@@ -21,6 +21,9 @@ namespace PitStop.API.Dtos
 
         [JsonPropertyName("tags")]
         public OpenStreetMapTagsDto? Tags { get; set; }
+
+        [JsonPropertyName("type")]
+        public string? Type { get; set; }
     }
 
     public class OpenStreetMapTagsDto

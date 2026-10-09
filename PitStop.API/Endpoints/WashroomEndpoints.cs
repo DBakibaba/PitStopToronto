@@ -71,11 +71,18 @@ public static class WashroomEndpoints
 
             });
 
-            group.MapGet("/osm-loblaws", async (OpenStreetMapService service) =>
-            {
-                string json = await service.GetLoblawsLocationsAsync();
+        
 
-                return Results.Content(json, "application/json");
+
+            group.MapPost("/import-osm-loblaws", async (OpenStreetMapService service) =>
+            {
+                var result = await service.GetLoblawsLocationsAsync();
+
+                return Results.Ok(new
+                {
+                    imported = result.Imported,
+                    updated = result.Updated
+                });
             });
         }
     }
