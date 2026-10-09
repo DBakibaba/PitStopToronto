@@ -17,6 +17,10 @@ builder.Services.AddScoped<WashroomService>();
 builder.Services.AddScoped<TorontoWashroomService>();
 builder.Services.AddScoped<TorontoLibraryService>();
 builder.Services.AddHttpClient();
+builder.Services.AddHttpClient<OpenStreetMapService>(client=>
+{
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("PitStop/1.0 (github.com/DBakibaba)");
+});
 builder.Services.AddScoped<OperatingHoursParser>();
 builder.Services.AddCors(options =>
 {
@@ -27,6 +31,7 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+
 
 
 var app = builder.Build();

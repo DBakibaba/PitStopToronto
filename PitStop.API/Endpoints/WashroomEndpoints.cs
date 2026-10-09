@@ -59,6 +59,8 @@ public static class WashroomEndpoints
                     imported = result.Imported,
                     updated = result.Updated
                 });
+
+
             });
 
             group.MapPost("/import-library", async (TorontoLibraryService torontoLibraryService) =>
@@ -67,6 +69,13 @@ public static class WashroomEndpoints
 
                 return Results.Ok();
 
+            });
+
+            group.MapGet("/osm-loblaws", async (OpenStreetMapService service) =>
+            {
+                string json = await service.GetLoblawsLocationsAsync();
+
+                return Results.Content(json, "application/json");
             });
         }
     }
