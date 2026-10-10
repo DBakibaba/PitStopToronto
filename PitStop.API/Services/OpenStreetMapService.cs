@@ -297,6 +297,101 @@ namespace PitStop.API.Services
 
         }
 
+
+        public async Task<(int Imported, int Updated)> GetTimHortonsLocationsAsync()
+        {
+            string query = """
+        [out:json][timeout:25];
+        nwr["name"="Tim Hortons"]["drive_through"="yes"](around:200000,43.7001,-79.4163);
+        out center;
+        """;
+
+            string url = "https://overpass-api.de/api/interpreter?data="
+                + Uri.EscapeDataString(query);
+
+            var response = await httpClient.GetAsync(url);
+
+            string json = await response.Content.ReadAsStringAsync();
+
+            response.EnsureSuccessStatusCode();
+
+            var osmResponse =
+                JsonSerializer.Deserialize<OpenStreetMapResponseDto>(json);
+
+            if (osmResponse is null)
+            {
+                throw new InvalidOperationException("OSM returned no response object.");
+            }
+
+            var existingLocations = await dbContext.Washrooms
+                .Where(washroom => washroom.Source == "OpenStreetMap")
+                .ToListAsync();
+
+            int importedCount = 0;
+            int updatedCount = 0;
+
+            foreach (var cafe in osmResponse.Elements)
+            {
+                double? latitude = cafe.Lat;
+                double? longitude = cafe.Lon;
+
+                if (!latitude.HasValue || !longitude.HasValue)
+                {
+                    latitude = cafe.Center?.Lat;
+                    longitude = cafe.Center?.Lon;
+                }
+
+                if (!latitude.HasValue || !longitude.HasValue)
+                {
+                    continue;
+                }
+
+                if (cafe.Tags is null)
+                {
+                    continue;
+                }
+
+                string externalId = $"{cafe.Type}/{cafe.Id}";
+
+                var existingLocation = existingLocations.FirstOrDefault(
+                    washroom => washroom.ExternalId == externalId);
+
+                if (existingLocation is not null)
+                {
+                    existingLocation.Name = cafe.Tags.Name ?? "Tim Hortons";
+                    existingLocation.Latitude = latitude.Value;
+                    existingLocation.Longitude = longitude.Value;
+                    existingLocation.Type = LocationType.Restaurant;
+                    existingLocation.Hours = cafe.Tags.OpeningHours;
+                    existingLocation.IsActive = true;
+
+                    updatedCount++;
+                    continue;
+                }
+
+                var washroom = new Washroom
+                {
+                    Name = cafe.Tags.Name ?? "Tim Hortons",
+                    Source = "OpenStreetMap",
+                    ExternalId = externalId,
+                    Latitude = latitude.Value,
+                    Longitude = longitude.Value,
+                    Type = LocationType.Restaurant,
+                    Status = FacilityStatus.Unknown,
+                    Hours = cafe.Tags.OpeningHours,
+                    IsActive = true
+                };
+
+                dbContext.Washrooms.Add(washroom);
+                existingLocations.Add(washroom);
+
+                importedCount++;
+            }
+
+            await dbContext.SaveChangesAsync();
+
+            return (importedCount, updatedCount);
+        }
     }
-}                                                                
+}                                                       
     

@@ -108,6 +108,16 @@ public static class WashroomEndpoints
                 });
             });
 
+            group.MapPost("/import-osm-tim-hortons", async (OpenStreetMapService service) =>
+            {
+                var result = await service.GetTimHortonsLocationsAsync();
+
+                return Results.Ok(new
+                {
+                    imported = result.Imported,
+                    updated = result.Updated
+                });
+            });
 
         }
     }
