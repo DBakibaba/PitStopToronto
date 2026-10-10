@@ -3,6 +3,7 @@ using PitStop.API.Data;
 using PitStop.API.Dtos;
 using System.Text.Json;
 using PitStop.API.Models;
+using System.Xml.Serialization;
 
 namespace PitStop.API.Services
 {
@@ -193,12 +194,106 @@ namespace PitStop.API.Services
                 existingLocations.Add(washroom);
                 importedCount++;
 
-            
+
             }
             await dbContext.SaveChangesAsync();
 
             return (importedCount, updatedCount);
 
+
+        }
+
+
+        public async Task<(int Imported, int Updated)> GetCanadianTireLocationsAsync()
+        {
+            string query = """
+            [out:json][timeout:25];
+            nwr["shop"="department_store"]["name"="Canadian Tire"](around:200000,43.7001,-79.4163);
+            out center;
+            """;
+            string url = "https://overpass-api.de/api/interpreter?data="
+                 + Uri.EscapeDataString(query);
+
+            var response = await httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            string json = await response.Content.ReadAsStringAsync();
+
+
+            var osmResponse = JsonSerializer.Deserialize<OpenStreetMapResponseDto>(json);
+
+            if (osmResponse is null)
+            {
+                throw new InvalidOperationException("OSM returned no response object.");
+            }
+
+            var existingLocations = await dbContext.Washrooms
+                .Where(washroom => washroom.Source == "OpenStreetMap")
+                .ToListAsync();
+
+            int importedCount = 0;
+            int updatedCount = 0;
+
+            foreach (var retailStore in osmResponse.Elements)
+            {
+                double? latitude = retailStore.Lat;
+                double? longitude = retailStore.Lon;
+
+                if (!latitude.HasValue || !longitude.HasValue)
+                {
+                    latitude = retailStore.Center?.Lat;
+                    longitude = retailStore.Center?.Lon;
+                }
+
+                if (!latitude.HasValue || !longitude.HasValue)
+                {
+                    continue;
+                }
+
+                if (retailStore.Tags is null)
+                {
+                    continue;
+                }
+
+                string externalId = $"{retailStore.Type}/{retailStore.Id}";
+
+                var existingLocation = existingLocations.FirstOrDefault(
+                    washroom => washroom.ExternalId == externalId);
+
+
+                if (existingLocation is not null)
+                {
+                    existingLocation.Name = retailStore.Tags.Name ?? "Canadian Tire";
+                    existingLocation.Latitude = latitude.Value;
+                    existingLocation.Longitude = longitude.Value;
+                    existingLocation.Type = LocationType.RetailStore;
+                    existingLocation.Hours = retailStore.Tags.OpeningHours;
+                    existingLocation.IsActive = true;
+
+                    updatedCount++;
+                    continue;
+                }
+
+                var washroom = new Washroom
+                {
+                    Name = retailStore.Tags.Name ?? "Canadian Tire",
+                    Source = "OpenStreetMap",
+                    ExternalId = externalId,
+                    Latitude = latitude.Value,
+                    Longitude = longitude.Value,
+                    Type = LocationType.RetailStore,
+                    Status = FacilityStatus.Unknown,
+                    Hours = retailStore.Tags.OpeningHours,
+                    IsActive = true
+                };
+
+                dbContext.Washrooms.Add(washroom);
+                existingLocations.Add(washroom);
+                importedCount++;
+
+            }
+            await dbContext.SaveChangesAsync();
+
+            return (importedCount, updatedCount);
 
         }
 
