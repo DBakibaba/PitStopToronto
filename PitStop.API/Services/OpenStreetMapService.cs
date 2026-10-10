@@ -41,7 +41,16 @@ namespace PitStop.API.Services
 
             foreach (var supermarket in osmResponse.Elements)
             {
-                if (!supermarket.Lat.HasValue || !supermarket.Lon.HasValue)
+                double? latitude = supermarket.Lat;
+                double? longitude = supermarket.Lon;
+
+                if (!latitude.HasValue || !longitude.HasValue)
+                {
+                    latitude = supermarket.Center?.Lat;
+                    longitude = supermarket.Center?.Lon;
+                }
+
+                if (!latitude.HasValue || !longitude.HasValue)
                 {
                     continue;
                 }
@@ -61,8 +70,8 @@ namespace PitStop.API.Services
                 if (existingLocation is not null)
                 {
                     existingLocation.Name = supermarket.Tags.Name;
-                    existingLocation.Latitude = supermarket.Lat.Value;
-                    existingLocation.Longitude = supermarket.Lon.Value;
+                    existingLocation.Latitude = latitude.Value;
+                    existingLocation.Longitude = longitude.Value;
                     existingLocation.Type = LocationType.GroceryStore;
                     existingLocation.Hours = supermarket.Tags.OpeningHours;
                     existingLocation.IsActive = true;
@@ -76,8 +85,8 @@ namespace PitStop.API.Services
                     Name = supermarket.Tags.Name,
                     Source = "OpenStreetMap",
                     ExternalId = externalId,
-                    Latitude = supermarket.Lat.Value,
-                    Longitude = supermarket.Lon.Value,
+                    Latitude = latitude.Value,
+                    Longitude = longitude.Value,
                     Type = LocationType.GroceryStore,
                     Status = FacilityStatus.Unknown,
                     Hours = supermarket.Tags.OpeningHours,

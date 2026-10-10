@@ -24,6 +24,9 @@ namespace PitStop.API.Dtos
 
         [JsonPropertyName("type")]
         public string? Type { get; set; }
+
+        [JsonPropertyName("center")]
+        public OpenStreeMapCenterDto? Center { get; set; }
     }
 
     public class OpenStreetMapTagsDto
@@ -39,5 +42,17 @@ namespace PitStop.API.Dtos
 
         [JsonPropertyName("opening_hours")]
         public string? OpeningHours { get; set; }
+
+        [JsonPropertyName("addr:street")]
+        public string? Street { get; set; }
+    }
+
+    public class OpenStreeMapCenterDto
+    {
+        [JsonPropertyName("lat")]
+        public double? Lat { get; set; }
+
+        [JsonPropertyName("lon")]
+        public double? Lon { get; set; }
     }
 }
