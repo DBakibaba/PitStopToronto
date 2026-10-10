@@ -84,6 +84,17 @@ public static class WashroomEndpoints
                     updated = result.Updated
                 });
             });
+
+            group.MapPost("/import-osm-home-depot",async(OpenStreetMapService service) =>
+            {
+                var result = await service.GetHomeDepotLocationAsync();
+
+                return Results.Ok(new
+                {
+                    imported = result.Imported,
+                    updated = result.Updated
+                });
+            });
         }
     }
 }
