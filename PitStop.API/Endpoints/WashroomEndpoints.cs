@@ -119,6 +119,18 @@ public static class WashroomEndpoints
                 });
             });
 
+
+            group.MapPost("/import-osm-mcdonalds", async (OpenStreetMapService service) =>
+            {
+                var result = await service.GetMcDonaldsLocationsAsync();
+
+                return Results.Ok(new
+                {
+                    imported = result.Imported,
+                    updated = result.Updated
+                });
+            });
+
         }
     }
 }

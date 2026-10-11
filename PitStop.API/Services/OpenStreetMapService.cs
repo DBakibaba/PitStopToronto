@@ -392,6 +392,104 @@ namespace PitStop.API.Services
 
             return (importedCount, updatedCount);
         }
+
+
+
+
+        public async Task<(int Imported, int Updated)> GetMcDonaldsLocationsAsync()
+        {
+            string query = """
+        [out:json][timeout:25];
+        nwr["name"="McDonald's"]["drive_through"="yes"](around:200000,43.7001,-79.4163);
+        out center;
+        """;
+
+            string url = "https://overpass-api.de/api/interpreter?data="
+                + Uri.EscapeDataString(query);
+
+            var response = await httpClient.GetAsync(url);
+
+            string json = await response.Content.ReadAsStringAsync();
+
+            response.EnsureSuccessStatusCode();
+
+            var osmResponse =
+                JsonSerializer.Deserialize<OpenStreetMapResponseDto>(json);
+
+            if (osmResponse is null)
+            {
+                throw new InvalidOperationException("OSM returned no response object.");
+            }
+
+            var existingLocations = await dbContext.Washrooms
+                .Where(washroom => washroom.Source == "OpenStreetMap")
+                .ToListAsync();
+
+            int importedCount = 0;
+            int updatedCount = 0;
+
+            foreach (var restaurant in osmResponse.Elements)
+            {
+                double? latitude = restaurant.Lat;
+                double? longitude = restaurant.Lon;
+
+                if (!latitude.HasValue || !longitude.HasValue)
+                {
+                    latitude = restaurant.Center?.Lat;
+                    longitude = restaurant.Center?.Lon;
+                }
+
+                if (!latitude.HasValue || !longitude.HasValue)
+                {
+                    continue;
+                }
+
+                if (restaurant.Tags is null)
+                {
+                    continue;
+                }
+
+                string externalId = $"{restaurant.Type}/{restaurant.Id}";
+
+                var existingLocation = existingLocations.FirstOrDefault(
+                    washroom => washroom.ExternalId == externalId);
+
+                if (existingLocation is not null)
+                {
+                    existingLocation.Name = restaurant.Tags.Name ?? "McDonald's";
+                    existingLocation.Latitude = latitude.Value;
+                    existingLocation.Longitude = longitude.Value;
+                    existingLocation.Type = LocationType.Restaurant;
+                    existingLocation.Hours = restaurant.Tags.OpeningHours;
+                    existingLocation.IsActive = true;
+
+                    updatedCount++;
+                    continue;
+                }
+
+                var washroom = new Washroom
+                {
+                    Name = restaurant.Tags.Name ?? "McDonald's",
+                    Source = "OpenStreetMap",
+                    ExternalId = externalId,
+                    Latitude = latitude.Value,
+                    Longitude = longitude.Value,
+                    Type = LocationType.Restaurant,
+                    Status = FacilityStatus.Unknown,
+                    Hours = restaurant.Tags.OpeningHours,
+                    IsActive = true
+                };
+
+                dbContext.Washrooms.Add(washroom);
+                existingLocations.Add(washroom);
+
+                importedCount++;
+            }
+
+            await dbContext.SaveChangesAsync();
+
+            return (importedCount, updatedCount);
+        }
     }
 }                                                       
     
