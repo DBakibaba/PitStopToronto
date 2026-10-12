@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PitStop.API.Models;
+using System.Diagnostics.Eventing.Reader;
 
 namespace PitStop.API.Services
 {
@@ -147,47 +148,67 @@ namespace PitStop.API.Services
                 hours = "Mo-Su 07:00-22:00";
             }
 
-
-            var parts = hours.Split(" ");
-
-            if (parts.Length != 2)
+            var groups = hours.Split(';');
+            foreach(var group in groups)
             {
-                return operatingHours;
-            }
 
-            string timeRange = parts[1];
+                string dayHours = group.Trim();
+                var parts = dayHours.Split(' ');
 
-            string[] splitHours = timeRange.Split("-");
-            string openTimeText = splitHours[0];
-            string closeTimeText = splitHours[1];
-
-            string dayRange = parts[0];
-
-            if (dayRange != "Mo-Su")
-            {
-                return operatingHours;
-            }
-
-
-            if (!TimeOnly.TryParse(openTimeText, out TimeOnly openTime) ||
-                !TimeOnly.TryParse(closeTimeText, out TimeOnly closeTime))
-            {
-                return operatingHours;
-            }
-
-            foreach (DayOfWeek day in Enum.GetValues<DayOfWeek>())
-            {
-                var PublicWashroomOperatingHours = new WashroomOperatingHour()
+                if (parts.Length !=2)
                 {
+                    return operatingHours;
+                }
 
-                    DayOfWeek = day,
-                    OpenTime = openTime,
-                    CloseTime = closeTime,
-                    IsClosed = false
-                };
-                operatingHours.Add(PublicWashroomOperatingHours);
+                string timeRange = parts[1];
+
+                string[] splitHours = timeRange.Split("-");
+                string openTimeText = splitHours[0];
+                string closeTimeText = splitHours[1];
+
+                string dayRange = parts[0];
+
+               
+
+
+                if (!TimeOnly.TryParse(openTimeText, out TimeOnly openTime) ||
+                    !TimeOnly.TryParse(closeTimeText, out TimeOnly closeTime))
+                {
+                    return operatingHours;
+                }
+
+                foreach (DayOfWeek day in Enum.GetValues<DayOfWeek>())
+                {
+                    if (dayRange != "Mo-Su" && dayRange != "Mo-Sa" && dayRange != "Su")
+                    {
+                        return operatingHours;
+                    }
+
+                    if (dayRange=="Mo-Sa" && day == DayOfWeek.Sunday)
+                    {
+                        continue;
+                    }
+                    else if (dayRange=="Su" && day != DayOfWeek.Sunday)
+                    {
+                        continue;
+                    }
+
+                    var PublicWashroomOperatingHours = new WashroomOperatingHour()
+                    {
+
+                        DayOfWeek = day,
+                        OpenTime = openTime,
+                        CloseTime = closeTime,
+                        IsClosed = false
+                    };
+                    operatingHours.Add(PublicWashroomOperatingHours);
+                     
+
+                }
 
             }
+
+           
             return operatingHours;
         }
 
