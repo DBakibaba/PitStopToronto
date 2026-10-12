@@ -328,7 +328,7 @@ namespace PitStop.API.Services
                 throw new InvalidOperationException("OSM returned no response object.");
             }
 
-            var existingLocations = await dbContext.Washrooms
+            var existingLocations = await dbContext.Washrooms.Include(w=>w.OperatingHours)
                 .Where(washroom => washroom.Source == "OpenStreetMap")
                 .ToListAsync();
 
@@ -369,6 +369,8 @@ namespace PitStop.API.Services
                     existingLocation.Type = LocationType.Restaurant;
                     existingLocation.Hours = cafe.Tags.OpeningHours;
                     existingLocation.IsActive = true;
+                    dbContext.OperatingHours.RemoveRange(existingLocation.OperatingHours);
+                    existingLocation.OperatingHours =operatingHoursParser.ParseOsmHours(cafe.Tags.OpeningHours);
 
                     updatedCount++;
                     continue;
@@ -384,7 +386,8 @@ namespace PitStop.API.Services
                     Type = LocationType.Restaurant,
                     Status = FacilityStatus.Unknown,
                     Hours = cafe.Tags.OpeningHours,
-                    IsActive = true
+                    IsActive = true,
+                    OperatingHours =operatingHoursParser.ParseOsmHours(cafe.Tags.OpeningHours),
                 };
 
                 dbContext.Washrooms.Add(washroom);
@@ -426,7 +429,7 @@ namespace PitStop.API.Services
                 throw new InvalidOperationException("OSM returned no response object.");
             }
 
-            var existingLocations = await dbContext.Washrooms
+            var existingLocations = await dbContext.Washrooms.Include(w=>w.OperatingHours)
                 .Where(washroom => washroom.Source == "OpenStreetMap")
                 .ToListAsync();
 
@@ -467,6 +470,9 @@ namespace PitStop.API.Services
                     existingLocation.Type = LocationType.Restaurant;
                     existingLocation.Hours = restaurant.Tags.OpeningHours;
                     existingLocation.IsActive = true;
+                    dbContext.OperatingHours.RemoveRange(existingLocation.OperatingHours);
+                    existingLocation.OperatingHours =operatingHoursParser.ParseOsmHours(restaurant.Tags.OpeningHours);
+
 
                     updatedCount++;
                     continue;
@@ -482,7 +488,8 @@ namespace PitStop.API.Services
                     Type = LocationType.Restaurant,
                     Status = FacilityStatus.Unknown,
                     Hours = restaurant.Tags.OpeningHours,
-                    IsActive = true
+                    IsActive = true,
+                    OperatingHours =operatingHoursParser.ParseOsmHours(restaurant.Tags.OpeningHours),
                 };
 
                 dbContext.Washrooms.Add(washroom);
