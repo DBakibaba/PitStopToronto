@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 
 namespace PitStop.API.Services
 {
-    public class OpenStreetMapService(HttpClient httpClient, PitStopDbContext dbContext)
+    public class OpenStreetMapService(HttpClient httpClient, PitStopDbContext dbContext,OperatingHoursParser operatingHoursParser)
     {
         public async Task<(int Imported, int Updated)> GetLoblawsLocationsAsync()
         {
@@ -33,7 +33,7 @@ namespace PitStop.API.Services
                 throw new InvalidOperationException("OSM returned no response object.");
             }
 
-            var existingLocations = await dbContext.Washrooms
+            var existingLocations = await dbContext.Washrooms.Include(w=>w.OperatingHours)
                 .Where(washroom => washroom.Source == "OpenStreetMap")
                 .ToListAsync();
 
@@ -75,6 +75,7 @@ namespace PitStop.API.Services
                     existingLocation.Longitude = longitude.Value;
                     existingLocation.Type = LocationType.GroceryStore;
                     existingLocation.Hours = supermarket.Tags.OpeningHours;
+                    existingLocation.OperatingHours =operatingHoursParser.ParseOsmHours(supermarket.Tags.OpeningHours);
                     existingLocation.IsActive = true;
 
                     updatedCount++;
@@ -91,7 +92,8 @@ namespace PitStop.API.Services
                     Type = LocationType.GroceryStore,
                     Status = FacilityStatus.Unknown,
                     Hours = supermarket.Tags.OpeningHours,
-                    IsActive = true
+                    IsActive = true,
+                    OperatingHours =operatingHoursParser.ParseOsmHours(supermarket.Tags.OpeningHours),
                 };
 
                 dbContext.Washrooms.Add(washroom);
