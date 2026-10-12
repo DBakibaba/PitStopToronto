@@ -135,5 +135,63 @@ namespace PitStop.API.Services
             }
             return operatingHours;
         }
-    }
+
+
+
+        public List<WashroomOperatingHour> ParseOsmHours(string? hours)
+        {
+            List<WashroomOperatingHour> operatingHours = new List<WashroomOperatingHour>();
+
+            if (string.IsNullOrWhiteSpace(hours))
+            {
+                hours = "Mo-Su 07:00-22:00";
+            }
+
+
+            var parts = hours.Split(" ");
+
+            if (parts.Length != 2)
+            {
+                return operatingHours;
+            }
+
+            string timeRange = parts[1];
+
+            string[] splitHours = timeRange.Split("-");
+            string openTimeText = splitHours[0];
+            string closeTimeText = splitHours[1];
+
+            string dayRange = parts[0];
+
+            if (dayRange != "Mo-Su")
+            {
+                return operatingHours;
+            }
+
+
+            if (!TimeOnly.TryParse(openTimeText, out TimeOnly openTime) ||
+                !TimeOnly.TryParse(closeTimeText, out TimeOnly closeTime))
+            {
+                return operatingHours;
+            }
+
+            foreach (DayOfWeek day in Enum.GetValues<DayOfWeek>())
+            {
+                var PublicWashroomOperatingHours = new WashroomOperatingHour()
+                {
+
+                    DayOfWeek = day,
+                    OpenTime = openTime,
+                    CloseTime = closeTime,
+                    IsClosed = false
+                };
+                operatingHours.Add(PublicWashroomOperatingHours);
+
+            }
+            return operatingHours;
+        }
+
+
+    };
+    
 }
