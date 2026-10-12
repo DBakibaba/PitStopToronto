@@ -10,11 +10,17 @@ function App() {
   const[errorMessage,setErrorMessage]=useState<string>("")
   const[latitude,setLatitude]=useState<number | null>(null)
   const[longitude,setLongitude]=useState<number | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   async function loadWashrooms() {
      
-    navigator.geolocation.getCurrentPosition(
-    async(position) => {
+    setIsLoading(true)
+    setErrorMessage("")
+
+    navigator.geolocation.getCurrentPosition
+    (
+      
+      async(position) => {
       const lat=position.coords.latitude
       const long=position.coords.longitude
       console.log("Browser location: ",lat,long)
@@ -22,20 +28,37 @@ function App() {
       setLatitude(lat)
       setLongitude(long)
        
-      const response=await fetch(`http://localhost:5042/washrooms/nearby?latitude=${lat}&longitude=${long}`)
+      try {
+      const response = await fetch(
+          `http://localhost:5042/washrooms/nearby?latitude=${lat}&longitude=${long}`
+      )
 
-      const data=await response.json()
-      setWashrooms(data)},
+      if (!response.ok) {
+          throw new Error(`Request failed: ${response.status}`)
+      }
 
-      (error)=>{
-      console.log(error)
-      setErrorMessage("Location permission is required to find nearby washrooms.")
-    
+      const data = await response.json()
+      setWashrooms(data)
+      }
+       catch (error) {
+        console.log(error)
+        setErrorMessage("Unable to load washrooms. Please try again.")
+      }   
+        finally {
+        setIsLoading(false)
       
-  })
+      }
+    },
+      (error)=>{
+        console.log(error)
+        setErrorMessage("Location permission is required to find nearby washrooms.")
+        setIsLoading(false)
+      }
+    )
+  }
 
   
-}
+
 
 
   return(
@@ -51,7 +74,7 @@ function App() {
      
     <p>    </p>
     <p>Find a nearby washroom in Toronto</p>
-    <button onClick={loadWashrooms}>Find Washrooms</button>
+    <button onClick={loadWashrooms} disabled={isLoading}>{isLoading ? "Finding washrooms..." : "Find Washrooms"}</button>
     <p>
       Washrooms found: {washrooms.length}</p> {errorMessage && <p>{errorMessage}</p>}
     {washrooms.map(washroom=>(
