@@ -2,5 +2,6 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
+  <Project Path="PitStop.API.Tests/PitStop.API.Tests.csproj" Id="0b75e2dd-0cf5-495b-ad14-61f69f5dc75e" />
   <Project Path="PitStop.API/PitStop.API.csproj" />
 </Solution>
