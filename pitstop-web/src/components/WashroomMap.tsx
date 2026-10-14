@@ -16,7 +16,7 @@ type MapControllerProps={
      longitude:number | null
 }
 
-const today=new Date().getDay()
+ 
 
 const dayNames=[
     "Sunday",
@@ -27,6 +27,39 @@ const dayNames=[
     "Friday",
     "Saturday"
 ]
+
+function getTorontoClock() {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Toronto",
+        weekday: "long",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23"
+    })
+
+    const parts = formatter.formatToParts(new Date("2026-10-14T01:30:00Z"))
+
+    let weekday = ""
+    let hour = 0
+    let minute = 0
+
+    for (const part of parts) {
+        if (part.type === "weekday") {
+            weekday = part.value
+        } else if (part.type === "hour") {
+            hour = Number(part.value)
+        } else if (part.type === "minute") {
+            minute = Number(part.value)
+        }
+    }
+
+    return {
+        day: dayNames.indexOf(weekday),
+        currentMinutes: hour * 60 + minute
+    }
+}
+
+
 function formatTime(time: string | null) : string {
 
     if(time === null){
@@ -46,12 +79,12 @@ function formatTime(time: string | null) : string {
     return `${displayHour}:${minute} ${period}`
 }
 
-function isOpenNow(openTime:string | null ,closeTime:string | null) : boolean {
+function isOpenNow(openTime:string | null ,closeTime:string | null, currentMinutes:number) : boolean {
 
     if(openTime===null || closeTime===null){
         return false
     }
-    const now=new Date()
+     
     const [openHour, openMinute] = openTime.split(":")
     const openHourNum = Number(openHour)
     const openMinuteNum = Number(openMinute)
@@ -63,7 +96,7 @@ function isOpenNow(openTime:string | null ,closeTime:string | null) : boolean {
     const sumOpenMinuteNum=openHourNum*60+openMinuteNum
     const sumCloseMinuteNum=closeHourNum*60 + closeMinuteNum
 
-    const currentMinutes=now.getHours()*60 + now.getMinutes()
+     
 
    
     return currentMinutes >= sumOpenMinuteNum && currentMinutes < sumCloseMinuteNum
@@ -95,10 +128,12 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
         const travelMode = "&travelmode=driving"; 
 
         window.open(baseUrl + origin  + destination + travelMode, '_blank')
-
+        
     }
-                
-                
+            
+            const torontoClock = getTorontoClock()
+            const today = torontoClock.day
+               
     return(
             <MapContainer 
          
@@ -136,7 +171,7 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                                     hoursText="Closed today"
                                     
                                 }else{
-                                     const result=isOpenNow(todayOperatingHour.openTime,todayOperatingHour.closeTime)
+                                     const result=isOpenNow(todayOperatingHour.openTime,todayOperatingHour.closeTime,torontoClock.currentMinutes)
                                      if(result===true){
                                             hoursText=`Open until ${formatTime(todayOperatingHour.closeTime)}`
                                      }else{
