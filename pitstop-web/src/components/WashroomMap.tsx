@@ -119,7 +119,7 @@ function MapController({latitude,longitude}:MapControllerProps){
     
 function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
        
-    const MapCenter= latitude !==null && longitude !==null 
+    const MapCenter:[number,number]= latitude !==null && longitude !==null 
                 ? [latitude,longitude] :  [43.6532,-79.3832]
 
     function openGoogleMaps(lat:number,long:number,wcLat:number,wcLong:number){
@@ -203,8 +203,15 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
 
                         
 
-                        <button onClick={()=>openGoogleMaps(latitude,longitude,washroom.latitude,washroom.longitude)}  
-                            > Get Direction
+                        <button disabled={latitude===null || longitude===null}
+                        onClick={()=>{
+                            if(latitude===null || longitude===null){
+                                return
+                            }
+                        
+                            openGoogleMaps(latitude,longitude,washroom.latitude,washroom.longitude)
+                        }}
+                    > Get Direction
 
                         </button>
                     </Popup>

@@ -9,6 +9,7 @@ export type Washroom={
   publicParking:string
   isAccessible:boolean
   operatingHours:OperatingHour[]
+  type:number
   
   
 }
