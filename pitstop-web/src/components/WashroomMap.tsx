@@ -162,7 +162,7 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                             const todayOperatingHour = washroom.operatingHours.find(
                                 operatingHour => operatingHour.dayOfWeek === today
                             )
-                            let hoursText=washroom.hours
+                            let hoursText=washroom.hours?.trim() ? washroom.hours : "Hours unknown. Check before travelling."
                             console.log("START:", washroom.name, hoursText)
 
                             if(todayOperatingHour !=null){
@@ -197,7 +197,7 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                          
                       
 
-                        <p> Hours:{hoursText}</p>
+                        <p> {hoursText}</p>
 
                         
 
