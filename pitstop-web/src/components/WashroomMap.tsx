@@ -37,7 +37,7 @@ function getTorontoClock() {
         hourCycle: "h23"
     })
 
-    const parts = formatter.formatToParts(new Date("2026-10-14T01:30:00Z"))
+    const parts = formatter.formatToParts(new Date())
 
     let weekday = ""
     let hour = 0
@@ -80,7 +80,7 @@ function formatTime(time: string | null) : string {
 }
 
 function isOpenNow(openTime:string | null ,closeTime:string | null, currentMinutes:number) : boolean {
-
+    
     if(openTime===null || closeTime===null){
         return false
     }
@@ -102,6 +102,7 @@ function isOpenNow(openTime:string | null ,closeTime:string | null, currentMinut
     return currentMinutes >= sumOpenMinuteNum && currentMinutes < sumCloseMinuteNum
 
 }
+
 
 
 function MapController({latitude,longitude}:MapControllerProps){
@@ -172,6 +173,16 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                                     
                                 }else{
                                      const result=isOpenNow(todayOperatingHour.openTime,todayOperatingHour.closeTime,torontoClock.currentMinutes)
+                                     if (washroom.id === 390) {
+                                            console.log("Jones availability:", {
+                                                today,
+                                                torontoClock,
+                                                openTime: todayOperatingHour.openTime,
+                                                closeTime: todayOperatingHour.closeTime,
+                                                result
+                                            })
+                                        }
+
                                      if(result===true){
                                             hoursText=`Open until ${formatTime(todayOperatingHour.closeTime)}`
                                      }else{
