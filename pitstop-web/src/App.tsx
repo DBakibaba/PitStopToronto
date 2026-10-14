@@ -78,7 +78,7 @@ function App() {
     <p>    </p>
     <p>Find a nearby washroom in Toronto</p>
     <button onClick={loadWashrooms} disabled={isLoading}>{isLoading ? "Finding washrooms..." : "Find Washrooms"}</button>
-    <p>hasSearched: {String(hasSearched)}</p>
+    
     {hasSearched && !isLoading && washrooms.length === 0 && (
     <p>No washrooms found within 3 km.</p>
 )}
