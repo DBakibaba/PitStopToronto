@@ -11,11 +11,13 @@ function App() {
   const[latitude,setLatitude]=useState<number | null>(null)
   const[longitude,setLongitude]=useState<number | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const[hasSearched,setHasSearch]=useState<boolean>(false)
 
   async function loadWashrooms() {
      
     setIsLoading(true)
     setErrorMessage("")
+    setHasSearch(false)
 
     navigator.geolocation.getCurrentPosition
     (
@@ -39,6 +41,7 @@ function App() {
 
       const data = await response.json()
       setWashrooms(data)
+      setHasSearch(true)
       }
        catch (error) {
         console.log(error)
@@ -75,6 +78,10 @@ function App() {
     <p>    </p>
     <p>Find a nearby washroom in Toronto</p>
     <button onClick={loadWashrooms} disabled={isLoading}>{isLoading ? "Finding washrooms..." : "Find Washrooms"}</button>
+    <p>hasSearched: {String(hasSearched)}</p>
+    {hasSearched && !isLoading && washrooms.length === 0 && (
+    <p>No washrooms found within 3 km.</p>
+)}
     <p>
       Washrooms found: {washrooms.length}</p> {errorMessage && <p>{errorMessage}</p>}
     {washrooms.map(washroom=>(
@@ -84,6 +91,7 @@ function App() {
         <p>{washroom.distanceKm.toFixed(2)} km away</p>
         <p>{washroom.hours}</p>
         <p>{washroom.publicParking}</p>
+        
       </div>
     ))}
   </div>
