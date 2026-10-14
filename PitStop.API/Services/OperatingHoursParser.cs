@@ -145,7 +145,7 @@ namespace PitStop.API.Services
 
             if (string.IsNullOrWhiteSpace(hours))
             {
-                hours = "Mo-Su 07:00-22:00";
+                return operatingHours;
             }
 
             //For Mc Donalds and Tim Hortons 

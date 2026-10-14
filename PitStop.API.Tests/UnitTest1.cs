@@ -30,13 +30,12 @@ namespace PitStop.API.Tests
             string hours = " ";
             var result = parser.ParseOsmHours(hours);
 
-            Assert.Equal(7, result.Count);
+            Assert.Equal(0, result.Count);
 
 
             foreach (var operatingHour in result)
             {
-                Assert.Equal(new TimeOnly(7, 0), operatingHour.OpenTime);
-                Assert.Equal(new TimeOnly(22, 0), operatingHour.CloseTime);
+                
                 Assert.False(operatingHour.IsClosed);
             }
 
