@@ -173,16 +173,7 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                                     
                                 }else{
                                      const result=isOpenNow(todayOperatingHour.openTime,todayOperatingHour.closeTime,torontoClock.currentMinutes)
-                                     if (washroom.id === 390) {
-                                            console.log("Jones availability:", {
-                                                today,
-                                                torontoClock,
-                                                openTime: todayOperatingHour.openTime,
-                                                closeTime: todayOperatingHour.closeTime,
-                                                result
-                                            })
-                                        }
-
+                                    
                                      if(result===true){
                                             hoursText=`Open until ${formatTime(todayOperatingHour.closeTime)}`
                                      }else{
@@ -201,7 +192,7 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                         position={[washroom.latitude,washroom.longitude]}
                 >
                     <Popup>
-                        <h3>{washroom.name}</h3>
+                       <h3>{washroom.type === 2  ? `${washroom.name} Public Library`: washroom.name}</h3>
                          
                         <p>{washroom.address}</p>
                         <p>{washroom.distanceKm.toFixed(2)} km away </p>
