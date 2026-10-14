@@ -58,10 +58,7 @@ public class WashroomService(PitStopDbContext dbContext)
         }
         TimeZoneInfo torontoTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Toronto");
 
-        //DateTime torontoNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, torontoTimeZone);
-        DateTime torontoNow = TimeZoneInfo.ConvertTimeFromUtc(
-    new DateTime(2026, 10, 14, 1, 30, 0, DateTimeKind.Utc),
-    torontoTimeZone);
+        DateTime torontoNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, torontoTimeZone);
 
 
         DayOfWeek today = torontoNow.DayOfWeek;
