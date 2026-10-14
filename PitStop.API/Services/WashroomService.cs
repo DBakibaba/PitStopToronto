@@ -56,7 +56,11 @@ public class WashroomService(PitStopDbContext dbContext)
         {
             return true;
         }
-        DayOfWeek today = DateTime.Now.DayOfWeek;
+        TimeZoneInfo torontoTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Toronto");
+
+        DateTime torontoNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, torontoTimeZone);
+
+        DayOfWeek today = torontoNow.DayOfWeek;
         var todayOperatingHour = washroom.OperatingHours.FirstOrDefault(operatingHour => operatingHour.DayOfWeek == today);
 
         if(todayOperatingHour == null )
@@ -67,11 +71,11 @@ public class WashroomService(PitStopDbContext dbContext)
         {
             return false;
         }
-        
-        
-            TimeOnly currentTime = TimeOnly.FromDateTime(DateTime.Now);
 
-        if(currentTime>=todayOperatingHour.OpenTime && currentTime <= todayOperatingHour.CloseTime)
+
+            TimeOnly currentTime = TimeOnly.FromDateTime(torontoNow);
+
+        if (currentTime>=todayOperatingHour.OpenTime && currentTime <= todayOperatingHour.CloseTime)
         {
             return true;
         }
