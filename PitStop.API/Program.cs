@@ -22,11 +22,13 @@ builder.Services.AddHttpClient<OpenStreetMapService>(client=>
     client.DefaultRequestHeaders.UserAgent.ParseAdd("PitStop/1.0 (github.com/DBakibaba)");
 });
 builder.Services.AddScoped<OperatingHoursParser>();
+string frontendOrigin = builder.Configuration["FrontendOrigin"]
+    ?? throw new InvalidOperationException("FrontendOrigin is not configured.");
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(frontendOrigin)
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
