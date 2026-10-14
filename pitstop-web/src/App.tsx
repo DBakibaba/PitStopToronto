@@ -3,7 +3,7 @@ import WashroomMap from "./components/WashroomMap"
 import type { Washroom } from "./types/Washroom"
 
 
-
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
 function App() {
   const[washrooms,setWashrooms]=useState<Washroom[]>([])
@@ -32,7 +32,7 @@ function App() {
        
       try {
       const response = await fetch(
-          `http://localhost:5042/washrooms/nearby?latitude=${lat}&longitude=${long}`
+          `${apiBaseUrl}/washrooms/nearby?latitude=${lat}&longitude=${long}`
       )
 
       if (!response.ok) {
@@ -86,7 +86,7 @@ function App() {
       Washrooms found: {washrooms.length}</p> {errorMessage && <p>{errorMessage}</p>}
     {washrooms.map(washroom=>(
       <div key={washroom.id}>
-        <h3>{washroom.name}</h3>
+        <h3>{washroom.type === 2 ? `${washroom.name} Public Library` : washroom.name}</h3>
         <p>{washroom.address}</p>
         <p>{washroom.distanceKm.toFixed(2)} km away</p>
         <p>{washroom.hours?.trim()? washroom.hours: "Hours unknown. Check before travelling."}</p>
