@@ -73,12 +73,24 @@ public class WashroomService(PitStopDbContext dbContext)
             return false;
         }
 
+        
+
 
             TimeOnly currentTime = TimeOnly.FromDateTime(torontoNow);
 
-        if (currentTime>=todayOperatingHour.OpenTime && currentTime <= todayOperatingHour.CloseTime)
+        if (todayOperatingHour.CloseTime > todayOperatingHour.OpenTime)
         {
-            return true;
+            if (currentTime >= todayOperatingHour.OpenTime && currentTime < todayOperatingHour.CloseTime)
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if (currentTime >= todayOperatingHour.OpenTime || currentTime < todayOperatingHour.CloseTime)
+            {
+                return true;
+            }
         }
 
         return false; 
