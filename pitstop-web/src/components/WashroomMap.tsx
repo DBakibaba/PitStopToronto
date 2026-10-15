@@ -1,6 +1,10 @@
 import { MapContainer, TileLayer,Marker,Popup,useMap,CircleMarker} from "react-leaflet"
 import type { Washroom } from "../types/Washroom"
 import "leaflet/dist/leaflet.css"
+import L from "leaflet"
+import markerIcon from "leaflet/dist/images/marker-icon.png"
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png"
+import markerShadow from "leaflet/dist/images/marker-shadow.png"
  
 import { useEffect } from "react"
 
@@ -27,6 +31,16 @@ const dayNames=[
     "Friday",
     "Saturday"
 ]
+
+const washroomIcon = L.icon({
+    iconUrl: markerIcon,
+    iconRetinaUrl: markerIcon2x,
+    shadowUrl: markerShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+})
 
 function getTorontoClock() {
     const formatter = new Intl.DateTimeFormat("en-US", {
@@ -190,6 +204,7 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                     <Marker 
                         key={washroom.id}
                         position={[washroom.latitude,washroom.longitude]}
+                        icon={washroomIcon}
                 >
                     <Popup>
                        <h3>{washroom.type === 2  ? `${washroom.name} Public Library`: washroom.name}</h3>
