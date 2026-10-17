@@ -166,16 +166,27 @@ namespace PitStop.API.Services
 
             var groups = hours.Split(';');
             foreach (var group in groups)
-            {
+            {   // ["08:00-23:00"] and ["Mo-We", "08:00-23:00"]
                 string dayHours = group.Trim();
                 var parts = dayHours.Split(' ');
-
-                if (parts.Length != 2)
+                string dayRange;
+                string timeRange;
+                if (parts.Length == 1)
+                {
+                    dayRange = "Mo-Su";
+                    timeRange = parts[0];
+                }
+                else if(parts.Length == 2)
+                {
+                    dayRange = parts[0];
+                    timeRange = parts[1];
+                }
+                else
                 {
                     return operatingHours;
                 }
 
-                string timeRange = parts[1];
+                
                 string[] splitHours = timeRange.Split("-");
 
                 if (splitHours.Length != 2)
@@ -185,7 +196,7 @@ namespace PitStop.API.Services
 
                 string openTimeText = splitHours[0];
                 string closeTimeText = splitHours[1];
-                string dayRange = parts[0];
+               
 
                 if (!TimeOnly.TryParse(openTimeText, out TimeOnly openTime) ||
                     !TimeOnly.TryParse(closeTimeText, out TimeOnly closeTime))
