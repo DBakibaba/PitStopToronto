@@ -232,5 +232,38 @@ namespace PitStop.API.Services
 
             return operatingHours;
         }
+
+
+
+
+        public DayOfWeek? ParseDayCode(string day)
+        {
+            switch (day)
+            {
+                case "Mo":
+                    return DayOfWeek.Monday;
+
+                case "Tu":
+                    return DayOfWeek.Tuesday;
+
+                case "We":
+                    return DayOfWeek.Wednesday;
+
+                case "Th":
+                    return DayOfWeek.Thursday;
+
+                case "Fr":
+                    return DayOfWeek.Friday;
+
+                case "Sa":
+                    return DayOfWeek.Saturday;
+
+                case "Su":
+                    return DayOfWeek.Sunday;
+
+            }
+            return null;
+
+        }
     };
 }
