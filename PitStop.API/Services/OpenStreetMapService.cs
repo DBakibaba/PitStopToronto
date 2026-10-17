@@ -21,6 +21,7 @@ namespace PitStop.API.Services
                 + Uri.EscapeDataString(query);
 
             var response = await httpClient.GetAsync(url);
+            
             response.EnsureSuccessStatusCode();
 
             string json = await response.Content.ReadAsStringAsync();

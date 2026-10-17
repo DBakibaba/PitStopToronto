@@ -30,7 +30,7 @@ namespace PitStop.API.Services
 
                 case "Sun":
                     return DayOfWeek.Sunday;
-     
+
             }
             throw new ArgumentException($"Unknown day:{day}");
 
@@ -42,7 +42,7 @@ namespace PitStop.API.Services
         }
 
 
-        public List<WashroomOperatingHour>ParseDailyHours(string? hours)
+        public List<WashroomOperatingHour> ParseDailyHours(string? hours)
         {
 
             List<WashroomOperatingHour> operatingHours = new List<WashroomOperatingHour>();
@@ -69,7 +69,7 @@ namespace PitStop.API.Services
                 return operatingHours;
             }
 
-            foreach(DayOfWeek day in Enum.GetValues<DayOfWeek>())
+            foreach (DayOfWeek day in Enum.GetValues<DayOfWeek>())
             {
                 var PublicWashroomOperatingHours = new WashroomOperatingHour()
                 {
@@ -89,18 +89,18 @@ namespace PitStop.API.Services
         public List<WashroomOperatingHour> Parse(string? hours)
         {
             List<WashroomOperatingHour> operatingHours = new List<WashroomOperatingHour>();
-            if(hours == null || hours== "Closed")
+            if (hours == null || hours == "Closed")
             {
                 return operatingHours;
             }
 
             var parts = hours.Split(';');
-            foreach(var part in parts)
+            foreach (var part in parts)
             {
                 var dayHour = part.Trim();
                 string[] splitHours = dayHour.Split(' ');
                 DayOfWeek day = ParseDay(splitHours[0]);
-                if (splitHours[1]=="Closed")
+                if (splitHours[1] == "Closed")
                 {
                     var exceptionOperatingHour = new WashroomOperatingHour()
                     {
@@ -114,10 +114,10 @@ namespace PitStop.API.Services
 
                     continue;
                 }
-                
-                
 
-                string openTimeText = $"{splitHours[1] + " " + splitHours[2]}" ;
+
+
+                string openTimeText = $"{splitHours[1] + " " + splitHours[2]}";
                 string closeTimeText = $"{splitHours[4] + " " + splitHours[5]}";
 
                 TimeOnly openTime = ParseTime(openTimeText);
@@ -138,7 +138,6 @@ namespace PitStop.API.Services
         }
 
 
-
         public List<WashroomOperatingHour> ParseOsmHours(string? hours)
         {
             List<WashroomOperatingHour> operatingHours = new List<WashroomOperatingHour>();
@@ -148,51 +147,44 @@ namespace PitStop.API.Services
                 return operatingHours;
             }
 
-            //For Mc Donalds and Tim Hortons 
+            // For McDonald's and Tim Hortons
             if (hours == "24/7")
             {
-               
-                    foreach (DayOfWeek day in Enum.GetValues<DayOfWeek>())
+                foreach (DayOfWeek day in Enum.GetValues<DayOfWeek>())
+                {
+                    var operatingHour = new WashroomOperatingHour
                     {
-                        var operatingHour = new WashroomOperatingHour
-                        {
-                            DayOfWeek = day,
-                            OpenTime = TimeOnly.MinValue,
-                            CloseTime = TimeOnly.MaxValue,
-                            IsClosed = false
-                        };
-
-                        operatingHours.Add(operatingHour);
-                    }
-
-                    return operatingHours;
-                
+                        DayOfWeek = day,
+                        OpenTime = TimeOnly.MinValue,
+                        CloseTime = TimeOnly.MaxValue,
+                        IsClosed = false
+                    };
+                    operatingHours.Add(operatingHour);
+                }
+                return operatingHours;
             }
 
             var groups = hours.Split(';');
-            foreach(var group in groups)
+            foreach (var group in groups)
             {
-
                 string dayHours = group.Trim();
                 var parts = dayHours.Split(' ');
 
-                if (parts.Length !=2 )
+                if (parts.Length != 2)
                 {
                     return operatingHours;
                 }
 
                 string timeRange = parts[1];
-
                 string[] splitHours = timeRange.Split("-");
 
                 if (splitHours.Length != 2)
                 {
                     return new List<WashroomOperatingHour>();
-
                 }
+
                 string openTimeText = splitHours[0];
                 string closeTimeText = splitHours[1];
-
                 string dayRange = parts[0];
 
                 if (!TimeOnly.TryParse(openTimeText, out TimeOnly openTime) ||
@@ -201,69 +193,86 @@ namespace PitStop.API.Services
                     return operatingHours;
                 }
 
-                foreach (DayOfWeek day in Enum.GetValues<DayOfWeek>())
+                List<DayOfWeek> days = ExpandDayRange(dayRange);
+
+                if (days.Count == 0)
                 {
-                    if (dayRange != "Mo-Su" && dayRange != "Mo-Sa" && dayRange != "Su")
-                    {
-                        return operatingHours;
-                    }
+                    return operatingHours;
+                }
 
-                    if (dayRange=="Mo-Sa" && day == DayOfWeek.Sunday)
+                foreach (DayOfWeek day in days)
+                {
+                    var operatingHour = new WashroomOperatingHour()
                     {
-                        continue;
-                    }
-                    else if (dayRange=="Su" && day != DayOfWeek.Sunday)
-                    {
-                        continue;
-                    }
-
-                    var PublicWashroomOperatingHours = new WashroomOperatingHour()
-                    {
-
                         DayOfWeek = day,
                         OpenTime = openTime,
                         CloseTime = closeTime,
                         IsClosed = false
                     };
-                    operatingHours.Add(PublicWashroomOperatingHours);
-                     
+                    operatingHours.Add(operatingHour);
                 }
             }
 
             return operatingHours;
         }
 
-
-
-
         public DayOfWeek? ParseDayCode(string day)
         {
             switch (day)
             {
-                case "Mo":
-                    return DayOfWeek.Monday;
-
-                case "Tu":
-                    return DayOfWeek.Tuesday;
-
-                case "We":
-                    return DayOfWeek.Wednesday;
-
-                case "Th":
-                    return DayOfWeek.Thursday;
-
-                case "Fr":
-                    return DayOfWeek.Friday;
-
-                case "Sa":
-                    return DayOfWeek.Saturday;
-
-                case "Su":
-                    return DayOfWeek.Sunday;
-
+                case "Mo": return DayOfWeek.Monday;
+                case "Tu": return DayOfWeek.Tuesday;
+                case "We": return DayOfWeek.Wednesday;
+                case "Th": return DayOfWeek.Thursday;
+                case "Fr": return DayOfWeek.Friday;
+                case "Sa": return DayOfWeek.Saturday;
+                case "Su": return DayOfWeek.Sunday;
             }
             return null;
-
         }
-    };
+
+        public List<DayOfWeek> ExpandDayRange(string dayRange)
+        {
+            List<DayOfWeek> days = new List<DayOfWeek>();
+
+            string[] pieces = dayRange.Split("-");
+            DayOfWeek? start;
+            DayOfWeek? end;
+
+            if (pieces.Length == 1)
+            {
+                start = ParseDayCode(pieces[0]);
+                end = start;
+            }
+            else if (pieces.Length == 2)
+            {
+                start = ParseDayCode(pieces[0]);
+                end = ParseDayCode(pieces[1]);
+            }
+            else
+            {
+                return days;
+            }
+
+            if (!start.HasValue || !end.HasValue)
+            {
+                return days;
+            }
+
+            DayOfWeek current = start.Value;
+
+            while (true)
+            {
+                days.Add(current);
+                if (current == end.Value)
+                {
+                    break;
+                }
+                current = (DayOfWeek)(((int)current + 1) % 7);
+            }
+
+            return days;
+        }
+    }
 }
+
