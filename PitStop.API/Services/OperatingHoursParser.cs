@@ -196,7 +196,10 @@ namespace PitStop.API.Services
 
                 string openTimeText = splitHours[0];
                 string closeTimeText = splitHours[1];
-               
+               if (closeTimeText == "24:00")
+                {
+                    closeTimeText = "00:00";
+                }
 
                 if (!TimeOnly.TryParse(openTimeText, out TimeOnly openTime) ||
                     !TimeOnly.TryParse(closeTimeText, out TimeOnly closeTime))
