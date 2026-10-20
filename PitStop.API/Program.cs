@@ -4,8 +4,13 @@ using Microsoft.AspNetCore.OpenApi;
 using PitStop.API.Data;
 using PitStop.API.Endpoints;
 using PitStop.API.Services;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddOpenApi();
 var connectionString =
     builder.Configuration.GetConnectionString("PitStopDatabase");
@@ -34,10 +39,24 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
+    options.AddPolicy("nearby", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 30,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+});
 
 var app = builder.Build();
 app.UseCors("Frontend");
+app.UseRateLimiter();
 app.MapWashroomEndpoints();
 if (app.Environment.IsDevelopment())
 {

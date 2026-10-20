@@ -41,7 +41,7 @@ public static class WashroomEndpoints
             );
 
      return Results.Ok(nearbyWashrooms);
- });
+ }).RequireRateLimiting("nearby");
         
         if (app.Environment.IsDevelopment())
         {
