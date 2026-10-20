@@ -86,11 +86,11 @@ function App() {
       Washrooms found: {washrooms.length}</p> {errorMessage && <p>{errorMessage}</p>}
     {washrooms.map(washroom=>(
       <div key={washroom.id}>
-        <h3>{washroom.type === 2 ? `${washroom.name} Public Library` : washroom.name}</h3>
+        <h3>{washroom.type === "Library" ? `${washroom.name} Public Library` : washroom.name}</h3>
         <p>{washroom.address}</p>
         <p>{washroom.distanceKm.toFixed(2)} km away</p>
-        <p>{washroom.hours?.trim()? washroom.hours: "Hours unknown. Check before travelling."}</p>
-        <p>{washroom.publicParking}</p>
+        <p>{washroom.hoursText}</p>
+        
         
       </div>
     ))}

@@ -74,50 +74,6 @@ function getTorontoClock() {
 }
 
 
-function formatTime(time: string | null) : string {
-
-    if(time === null){
-        return ""
-    }
-    const[hour,minute] = time.split(":")
-    const hourNumber=Number(hour)
-    const period=hourNumber >=12? "PM" : "AM"
-    let displayHour=hourNumber
-    if (hourNumber >12){
-        displayHour=hourNumber-12
-    }
-    if(hourNumber ===0){
-        displayHour=12
-    }
-
-    return `${displayHour}:${minute} ${period}`
-}
-
-function isOpenNow(openTime:string | null ,closeTime:string | null, currentMinutes:number) : boolean {
-    
-    if(openTime===null || closeTime===null){
-        return false
-    }
-     
-    const [openHour, openMinute] = openTime.split(":")
-    const openHourNum = Number(openHour)
-    const openMinuteNum = Number(openMinute)
-
-    const [closeHour, closeMinute] = closeTime.split(":")
-    const closeHourNum=Number(closeHour)
-    const closeMinuteNum=Number(closeMinute)
-
-    const sumOpenMinuteNum=openHourNum*60+openMinuteNum
-    const sumCloseMinuteNum=closeHourNum*60 + closeMinuteNum
-
-     
-
-   
-    return currentMinutes >= sumOpenMinuteNum && currentMinutes < sumCloseMinuteNum
-
-}
-
-
 
 function MapController({latitude,longitude}:MapControllerProps){
     const map = useMap()
@@ -173,32 +129,7 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                 )}
 
                 {washrooms.map(washroom => {
-
-                            const todayOperatingHour = washroom.operatingHours.find(
-                                operatingHour => operatingHour.dayOfWeek === today
-                            )
-                            let hoursText=washroom.hours?.trim() ? washroom.hours : "Hours unknown. Check before travelling."
-                            console.log("START:", washroom.name, hoursText)
-
-                            if(todayOperatingHour !=null){
-                                 
-                                if(todayOperatingHour.isClosed){
-                                    hoursText="Closed today"
-                                    
-                                }else{
-                                     const result=isOpenNow(todayOperatingHour.openTime,todayOperatingHour.closeTime,torontoClock.currentMinutes)
-                                    
-                                     if(result===true){
-                                            hoursText=`Open until ${formatTime(todayOperatingHour.closeTime)}`
-                                     }else{
-                                        hoursText="Closed today"
-                                     }
-                                      
-                                    
-                                }
-                                 
-                            }
-                               
+                     
                     return (
 
                     <Marker 
@@ -207,16 +138,12 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                         icon={washroomIcon}
                 >
                     <Popup>
-                       <h3>{washroom.type === 2  ? `${washroom.name} Public Library`: washroom.name}</h3>
+                       <h3>{washroom.type === "Library"  ? `${washroom.name} Public Library`: washroom.name}</h3>
                          
                         <p>{washroom.address}</p>
                         <p>{washroom.distanceKm.toFixed(2)} km away </p>
+                        <p>{washroom.hoursText}</p>
                          
-                      
-
-                        <p> {hoursText}</p>
-
-                        
 
                         <button disabled={latitude===null || longitude===null}
                         onClick={()=>{

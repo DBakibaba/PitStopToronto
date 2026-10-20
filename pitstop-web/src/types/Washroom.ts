@@ -5,20 +5,10 @@ export type Washroom={
   distanceKm:number
   latitude:number
   longitude:number
-  hours:string | null
-  publicParking:string
-  isAccessible:boolean
-  operatingHours:OperatingHour[]
-  type:number
+  type:string
+  hoursText:string
   
   
 }
 
-export type OperatingHour={
-  id:number
-  washroomId:number
-  dayOfWeek:number  
-  openTime:string | null
-  closeTime:string  | null
-  isClosed:boolean
-}
+ 
