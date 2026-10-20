@@ -14,7 +14,13 @@ public class WashroomService(PitStopDbContext dbContext)
 
     }
     public async Task<List<NearbyWashroomDto>> GetNearByAsync(double latitude, double longitude)
+
+
     {
+        TimeZoneInfo torontoTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Toronto");
+        DateTime torontoNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, torontoTimeZone);
+        DayOfWeek today = torontoNow.DayOfWeek;
+
         var activeWashrooms = await dbContext.Washrooms.Where(washroom => washroom.IsActive).Include(washroom => washroom.OperatingHours).ToListAsync();
 
         var availableWashrooms = activeWashrooms.Where(washroom => IsAvailableNow(washroom));
@@ -35,11 +41,10 @@ public class WashroomService(PitStopDbContext dbContext)
                 washroom.Latitude,
                 washroom.Longitude,
                 distance,
-                washroom.Type,
-                washroom.Status,
-                washroom.Hours,
-                washroom.IsAccessible,
-                washroom.OperatingHours.ToList()
+                washroom.Type.ToString(),
+                BuildHoursText(washroom,today)
+                
+                
             );
         });
 
@@ -118,6 +123,32 @@ public class WashroomService(PitStopDbContext dbContext)
 
         return EarthRadiusKm * c;
 
+    }
+
+    private static string BuildHoursText(Washroom washroom,DayOfWeek today)
+    {
+        const string unknown = "Hours unknown. Check before travelling.";
+        if (washroom.OperatingHours.Count ==null)
+        {
+            return unknown;
+        }
+
+        var todayHour = washroom.OperatingHours.FirstOrDefault(h => h.DayOfWeek == today);
+
+        if(todayHour==null || !todayHour.CloseTime.HasValue)
+        {
+            return unknown;
+        }
+
+        TimeOnly close = todayHour.CloseTime.Value;
+
+        if (todayHour.OpenTime == TimeOnly.MinValue &&
+         (close >= new TimeOnly(23, 59) || close == TimeOnly.MinValue))
+        {
+            return "Open 24 hours";
+        }
+
+        return $"Open until {close.ToString("h:mm tt")}";
     }
 
 }

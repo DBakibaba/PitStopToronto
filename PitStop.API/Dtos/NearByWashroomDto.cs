@@ -9,9 +9,6 @@ public record NearbyWashroomDto(
     double Latitude,
     double Longitude,
     double DistanceKm,
-    LocationType Type,
-    FacilityStatus Status,
-    string? Hours,
-    bool IsAccessible,
-    List<WashroomOperatingHour> OperatingHours 
+    string Type,
+    string HoursText
 );
