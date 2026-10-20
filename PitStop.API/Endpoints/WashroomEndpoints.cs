@@ -129,16 +129,16 @@ public static class WashroomEndpoints
             group.MapPost("/import-osm-all", async (OpenStreetMapService service) =>
             {
                 var loblaws = await service.GetLoblawsLocationsAsync();
-                 
+                var homeDepot = await service.GetHomeDepotLocationAsync();
                 var canadianTire = await service.GetCanadianTireLocationsAsync();
                 var timHortons = await service.GetTimHortonsLocationsAsync();
                 var mcDonalds = await service.GetMcDonaldsLocationsAsync();
 
                 return Results.Ok(new
                 {
-                    imported = loblaws.Imported  + canadianTire.Imported
+                    imported = loblaws.Imported + homeDepot.Imported + canadianTire.Imported
                              + timHortons.Imported + mcDonalds.Imported,
-                    updated = loblaws.Updated   + canadianTire.Updated
+                    updated = loblaws.Updated + homeDepot.Updated + canadianTire.Updated
                             + timHortons.Updated + mcDonalds.Updated
                 });
             });
