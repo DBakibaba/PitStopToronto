@@ -84,11 +84,7 @@ public class TorontoWashroomService(HttpClient httpClient, PitStopDbContext dbCo
 
                 existingWashroom.Hours = incomingHours;
                 existingWashroom.OperatingHours = newOperatingHours;
-                if (existingWashroom.Id == 1)
-                {
-                    Console.WriteLine(
-                        $"Washroom {existingWashroom.Id}: Hours='{incomingHours}', Parsed={newOperatingHours.Count}, Assigned={existingWashroom.OperatingHours.Count}");
-                }
+                
 
                 updatedCount++;
 
