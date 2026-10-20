@@ -67,21 +67,19 @@ function App() {
   return(
   <div>
     <h1>PitStop</h1>
-    
-    
-    <WashroomMap 
+    <p>    </p>
+    <p>Find a nearby washroom in Toronto</p>
+    <button onClick={loadWashrooms} disabled={isLoading}>{isLoading ? "Finding washrooms..." : "Find Washrooms"}</button>
+    {errorMessage && <p>{errorMessage}</p>}
+    {hasSearched && !isLoading && washrooms.length === 0 && (
+    <p>No washrooms found within 3 km.</p>)}
+
+      <WashroomMap 
     washrooms={washrooms} 
     latitude={latitude}
     longitude={longitude}/> 
  
-     
-    <p>    </p>
-    <p>Find a nearby washroom in Toronto</p>
-    <button onClick={loadWashrooms} disabled={isLoading}>{isLoading ? "Finding washrooms..." : "Find Washrooms"}</button>
-    
-    {hasSearched && !isLoading && washrooms.length === 0 && (
-    <p>No washrooms found within 3 km.</p>
-)}
+
     <p>
       Washrooms found: {washrooms.length}</p> {errorMessage && <p>{errorMessage}</p>}
     {washrooms.map(washroom=>(
