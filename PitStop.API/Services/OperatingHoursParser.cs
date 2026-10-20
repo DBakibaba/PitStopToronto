@@ -176,7 +176,7 @@ namespace PitStop.API.Services
                     dayRange = "Mo-Su";
                     timeRange = parts[0];
                 }
-                else if(parts.Length == 2)
+                else if (parts.Length == 2)
                 {
                     dayRange = parts[0];
                     timeRange = parts[1];
@@ -186,7 +186,7 @@ namespace PitStop.API.Services
                     return operatingHours;
                 }
 
-                
+
                 string[] splitHours = timeRange.Split("-");
 
                 if (splitHours.Length != 2)
@@ -196,7 +196,7 @@ namespace PitStop.API.Services
 
                 string openTimeText = splitHours[0];
                 string closeTimeText = splitHours[1];
-               if (closeTimeText == "24:00")
+                if (closeTimeText == "24:00")
                 {
                     closeTimeText = "00:00";
                 }
@@ -207,7 +207,7 @@ namespace PitStop.API.Services
                     return operatingHours;
                 }
 
-                List<DayOfWeek> days = ExpandDayRange(dayRange);
+                List<DayOfWeek> days = ExpandDayList(dayRange);
 
                 if (days.Count == 0)
                 {
@@ -286,6 +286,32 @@ namespace PitStop.API.Services
             }
 
             return days;
+        }
+
+
+        public List<DayOfWeek> ExpandDayList(string dayRange)
+        {
+            List<DayOfWeek> allDays = new List<DayOfWeek>();
+            string[] pieces = dayRange.Split(",");
+            
+            foreach (string piece in pieces)
+            {
+                string trimmed = piece.Trim();
+                if (trimmed == "PH")
+                {
+                    continue;
+                }
+
+                List<DayOfWeek> days = ExpandDayRange(trimmed);
+                if (days.Count == 0)
+                {
+                    return new List<DayOfWeek>();
+                }
+                allDays.AddRange(days);
+
+            }
+            return allDays;
+
         }
     }
 }
