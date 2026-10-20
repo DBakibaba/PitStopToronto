@@ -135,7 +135,7 @@ namespace PitStop.API.Services
                 throw new InvalidOperationException("OSM returned no response object.");
             }
 
-            var existingLocations = await dbContext.Washrooms
+            var existingLocations = await dbContext.Washrooms.Include(w=>w.OperatingHours)
                 .Where(washroom => washroom.Source == "OpenStreetMap")
                 .ToListAsync();
 
@@ -174,6 +174,8 @@ namespace PitStop.API.Services
                     existingLocation.Type = LocationType.GroceryStore;
                     existingLocation.Hours = retailStore.Tags.OpeningHours;
                     existingLocation.IsActive = true;
+                    dbContext.OperatingHours.RemoveRange(existingLocation.OperatingHours);
+                    existingLocation.OperatingHours = operatingHoursParser.ParseOsmHours(retailStore.Tags.OpeningHours);
 
                     updatedCount++;
                     continue;
@@ -190,7 +192,8 @@ namespace PitStop.API.Services
                     Type = LocationType.GroceryStore,
                     Status = FacilityStatus.Unknown,
                     Hours = retailStore.Tags.OpeningHours,
-                    IsActive = true
+                    IsActive = true,
+                    OperatingHours = operatingHoursParser.ParseOsmHours(retailStore.Tags.OpeningHours)
                 };
 
                 dbContext.Washrooms.Add(washroom);
