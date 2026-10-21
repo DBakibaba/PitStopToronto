@@ -22,15 +22,7 @@ type MapControllerProps={
 
  
 
-const dayNames=[
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday"
-]
+ 
 
 const washroomIcon = L.icon({
     iconUrl: markerIcon,
@@ -42,36 +34,7 @@ const washroomIcon = L.icon({
     shadowSize: [41, 41]
 })
 
-function getTorontoClock() {
-    const formatter = new Intl.DateTimeFormat("en-US", {
-        timeZone: "America/Toronto",
-        weekday: "long",
-        hour: "2-digit",
-        minute: "2-digit",
-        hourCycle: "h23"
-    })
-
-    const parts = formatter.formatToParts(new Date())
-
-    let weekday = ""
-    let hour = 0
-    let minute = 0
-
-    for (const part of parts) {
-        if (part.type === "weekday") {
-            weekday = part.value
-        } else if (part.type === "hour") {
-            hour = Number(part.value)
-        } else if (part.type === "minute") {
-            minute = Number(part.value)
-        }
-    }
-
-    return {
-        day: dayNames.indexOf(weekday),
-        currentMinutes: hour * 60 + minute
-    }
-}
+ 
 
 
 
@@ -102,8 +65,7 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
         
     }
             
-            const torontoClock = getTorontoClock()
-            const today = torontoClock.day
+         
                
     return(
             <MapContainer 
