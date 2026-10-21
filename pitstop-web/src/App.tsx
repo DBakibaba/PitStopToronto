@@ -1,6 +1,7 @@
 import {useState} from 'react'
 import WashroomMap from "./components/WashroomMap"
 import type { Washroom } from "./types/Washroom"
+import './App.css'
 
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
@@ -69,7 +70,7 @@ function App() {
     <h1>PitStop</h1>
     <p>    </p>
     <p>Find a nearby washroom in Toronto</p>
-    <button onClick={loadWashrooms} disabled={isLoading}>{isLoading ? "Finding washrooms..." : "Find Washrooms"}</button>
+    <button className="find-button" onClick={loadWashrooms} disabled={isLoading}>{isLoading ? "Finding washrooms..." : "Find Washrooms"}</button>
     {errorMessage && <p>{errorMessage}</p>}
     {hasSearched && !isLoading && washrooms.length === 0 && (
     <p>No washrooms found within 3 km.</p>)}

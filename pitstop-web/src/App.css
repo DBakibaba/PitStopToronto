@@ -182,3 +182,22 @@
     border-right-color: var(--border);
   }
 }
+  
+  .find-button{
+    width: 100%;
+    max-width: 300px;
+    min-height: 56px;
+    padding: 12px 24px;
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    background-color: #2563eb;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.find-button:hover {
+    background-color: #1d4ed8;
+}
+
