@@ -82,10 +82,11 @@ function WashroomMap({washrooms,latitude,longitude}:WashroomMapProps){
                 />
 
 
-                <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" attribution='&copy;
-                <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; 
-                <a href="https://carto.com/attributions">CARTO</a>'
+                <TileLayer
+    url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 />
+
                 {latitude !==null && longitude !== null &&(
                     <CircleMarker    
                         center={[latitude,longitude]} radius={10}>
