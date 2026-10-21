@@ -89,7 +89,14 @@ function App() {
         <p>{washroom.address}</p>
         <p>{washroom.distanceKm.toFixed(2)} km away</p>
         <p>{washroom.hoursText}</p>
-        
+        <a
+    className="directions-button"
+    href={`https://www.google.com/maps/dir/?api=1&destination=${washroom.latitude},${washroom.longitude}`}
+    target="_blank"
+    rel="noopener noreferrer"
+>
+    Get Directions
+</a>
         
       </div>
     ))}

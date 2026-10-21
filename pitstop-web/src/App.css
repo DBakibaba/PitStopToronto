@@ -201,3 +201,20 @@
     background-color: #1d4ed8;
 }
 
+.leaflet-popup-content .directions-button {
+  display:block;
+  margin:8px auto  0;
+}
+
+.directions-button {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 10px 20px;
+    min-height: 44px;
+    box-sizing: border-box;
+    font-weight: 700;
+    color: white;
+    background-color: #16a34a;
+    border-radius: 10px;
+    text-decoration: none;
+}
