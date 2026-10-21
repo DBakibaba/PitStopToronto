@@ -61,8 +61,6 @@ function App() {
     )
   }
 
-  
-
 
 
   return(
@@ -75,14 +73,12 @@ function App() {
     {hasSearched && !isLoading && washrooms.length === 0 && (
     <p>No washrooms found within 3 km.</p>)}
 
-      <WashroomMap 
-    washrooms={washrooms} 
-    latitude={latitude}
-    longitude={longitude}/> 
- 
+    {hasSearched && <WashroomMap washrooms={washrooms} latitude={latitude} 
+    longitude={longitude}/> }
 
-    <p>
-      Washrooms found: {washrooms.length}</p> {errorMessage && <p>{errorMessage}</p>}
+    {washrooms.length > 0 && <p> Nearest washrooms:</p>}
+    {errorMessage && <p>{errorMessage}</p>}
+
     {washrooms.map(washroom=>(
       <div key={washroom.id}>
         <h3>{washroom.type === "Library" ? `${washroom.name} Public Library` : washroom.name}</h3>
