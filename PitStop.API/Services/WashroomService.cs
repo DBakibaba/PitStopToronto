@@ -50,7 +50,7 @@ public class WashroomService(PitStopDbContext dbContext)
 
         var nearbyWashrooms = washroomsWithDistance
         .Where(dto => dto.DistanceKm <= 3)
-        .OrderBy(dto => dto.DistanceKm).ToList();
+        .OrderBy(dto => dto.DistanceKm).Take(10).ToList();
 
         return nearbyWashrooms;
 
