@@ -128,7 +128,7 @@ public class WashroomService(PitStopDbContext dbContext)
     private static string BuildHoursText(Washroom washroom,DayOfWeek today)
     {
         const string unknown = "Hours unknown. Check before travelling.";
-        if (washroom.OperatingHours.Count ==null)
+        if (washroom.OperatingHours.Count ==0)
         {
             return unknown;
         }
