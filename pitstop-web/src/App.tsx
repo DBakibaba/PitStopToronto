@@ -1,9 +1,10 @@
-import {useState} from 'react'
+ 
 import WashroomMap from "./components/WashroomMap"
 import type { Washroom } from "./types/Washroom"
 import './App.css'
 import torontoSkyline from "./assets/toronto-skyline.png"
 import pitstopLogo from "./assets/pitstop-logo.png"
+import { useState, useEffect } from "react"
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
@@ -16,6 +17,31 @@ function App() {
   const[hasSearched,setHasSearch]=useState<boolean>(false)
   const [activeView, setActiveView] = useState<"list" | "map">("list")
 
+  useEffect(() => {
+  
+    if(!hasSearched){
+      return
+    }
+   const watchId=navigator.geolocation.watchPosition(
+  
+    (position)=>{
+      setLatitude(position.coords.latitude)
+      setLongitude(position.coords.longitude)
+    },
+  
+    (error)=>{
+    console.error("Location tracking failed:", error.message);
+  
+  },
+  
+   {enableHighAccuracy:true}
+    )
+    return()=>{
+      navigator.geolocation.clearWatch(watchId)
+    }
+      
+  }, [hasSearched])
+  
   async function loadWashrooms() {
      
     setIsLoading(true)
@@ -112,6 +138,7 @@ function App() {
         onClick={loadWashrooms}
         disabled={isLoading}
       >
+        {isLoading && <span className="loading-spinner" aria-hidden="true"/>}
         {searchButtonText}
       </button>
 
