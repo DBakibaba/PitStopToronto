@@ -250,7 +250,7 @@
 .view-switch {
   display: flex;
   max-width: 600px;
-  margin: 24px auto;
+  margin: 8px auto 12px;
   padding: 4px;
   background: #202631;
   border: 1px solid #465366;
@@ -259,12 +259,12 @@
 
 .view-switch button {
   flex: 1;
-  min-height: 48px;
+  min-height: 32px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   background: transparent;
   color: white;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
 }
 
@@ -284,22 +284,22 @@
 }
 .washroom-card {
   max-width: 600px;
-  margin: 16px auto;
-  padding: 20px;
+  margin: 10px auto;
+  padding: 10px;
   box-sizing: border-box;
   background: #1c222b;
   border: 1px solid #465366;
-  border-radius: 14px;
+  border-radius: 12px;
   text-align: left;
 }
 
 .washroom-card h3 {
-  margin: 0 0 12px;
+  margin: 0 0 6px;
   color: #f5f7fa;
 }
 
 .washroom-card p {
-  margin: 8px 0;
+  margin: 2px 0;
   color: #b7c0ce;
   line-height: 1.5;
 }
@@ -392,7 +392,7 @@
   height: 16px;
   border: 2px solid currentColor;
   border-top-color: transparent;
-  border-radius: 50%;
+  border-radius: 25%;
   animation: spin 0.8s linear infinite;
 }
 
@@ -409,4 +409,25 @@
   .loading-spinner {
     animation: none;
   }
+}
+
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  max-width: 600px;
+  margin: 12px auto;
+}
+
+.results-header h1 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.results-header .search-again-button {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 14px;
 }

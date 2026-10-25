@@ -3,7 +3,6 @@ import WashroomMap from "./components/WashroomMap"
 import type { Washroom } from "./types/Washroom"
 import './App.css'
 import torontoSkyline from "./assets/toronto-skyline.png"
-import pitstopLogo from "./assets/pitstop-logo.png"
 import { useState, useEffect } from "react"
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
@@ -98,49 +97,55 @@ function App() {
 
 
    return (
-    <div>
-      <h1 className="brand-name">
-          {hasSearched ? (
-            <img
-              className="pitstop-logo"
-              src={pitstopLogo}
-              alt="PitStop"
-            />
-          ) : (
-            "PitStop"
-          )}
-      </h1>
-
-      {/* Introduction: visible before the first successful search */}
-      {!hasSearched && (
         <div>
-          <h2 className="hero-heading">
-            A quick stop.
-            <br />
-            A better trip.
-          </h2>
+          {hasSearched ? (
+      <header className="results-header">
+        <h1>PitStop</h1>
 
-          <p className="hero-description">
-            Find nearby washrooms in Toronto.
-          </p>
+        <button
+          className="search-again-button"
+          onClick={loadWashrooms}
+          disabled={isLoading}
+        >
+          {isLoading && (
+            <span className="loading-spinner" aria-hidden="true" />
+          )}
+          {isLoading ? "Searching..." : "Search again"}
+        </button>
+      </header>
+    ) : (
+      <div>
+        <h1 className="brand-name">PitStop</h1>
 
-          <img
-            className="toronto-skyline"
-            src={torontoSkyline}
-            alt=""
-          />
-        </div>
-      )}
+        <h2 className="hero-heading">
+          A quick stop.
+          <br />
+          A better trip.
+        </h2>
 
-      {/* Search button: always visible */}
-      <button
-        className="find-button"
-        onClick={loadWashrooms}
-        disabled={isLoading}
-      >
-        {isLoading && <span className="loading-spinner" aria-hidden="true"/>}
-        {searchButtonText}
-      </button>
+        <p className="hero-description">
+          Find nearby washrooms in Toronto.
+        </p>
+
+        <img
+          className="toronto-skyline"
+          src={torontoSkyline}
+          alt=""
+        />
+
+        <button
+          className="find-button"
+          onClick={loadWashrooms}
+          disabled={isLoading}
+        >
+          {isLoading && (
+            <span className="loading-spinner" aria-hidden="true" />
+          )}
+          {searchButtonText}
+        </button>
+      </div>
+    )}
+            
 
       {errorMessage && <p>{errorMessage}</p>}
 
