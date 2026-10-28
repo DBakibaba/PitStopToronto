@@ -13,7 +13,7 @@ public class WashroomService(PitStopDbContext dbContext)
         return await dbContext.Washrooms.Include(w=>w.OperatingHours).ToListAsync();
 
     }
-    public async Task<List<NearbyWashroomDto>> GetNearByAsync(double latitude, double longitude)
+    public async Task<List<NearbyWashroomDto>> GetNearByAsync(double latitude, double longitude,LocationType? type)
 
 
     {
@@ -24,6 +24,10 @@ public class WashroomService(PitStopDbContext dbContext)
         var activeWashrooms = await dbContext.Washrooms.Where(washroom => washroom.IsActive).Include(washroom => washroom.OperatingHours).ToListAsync();
 
         var availableWashrooms = activeWashrooms.Where(washroom => IsAvailableNow(washroom));
+        if (type.HasValue)
+        {
+            availableWashrooms = availableWashrooms.Where(washroom => washroom.Type == type.Value);
+        }
 
         var washroomsWithDistance = availableWashrooms.Select(washroom =>
         {
@@ -146,7 +150,7 @@ public class WashroomService(PitStopDbContext dbContext)
          (close >= new TimeOnly(23, 59) || close == TimeOnly.MinValue))
         {
             return "Open 24 hours";
-        }
+        }   
 
         return $"Open until {close.ToString("h:mm tt")}";
     }

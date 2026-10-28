@@ -9,5 +9,7 @@ public enum LocationType
     Restaurant,
     GroceryStore,
     RetailStore,
-    RecreationCentre
+    RecreationCentre,
+    Coffee
+
 }
