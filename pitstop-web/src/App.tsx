@@ -194,11 +194,19 @@ function App() {
           </button>
 
           <button
+            onClick={() => selectCategory(5)}
+            aria-pressed={selectedType === 5}
+            disabled={isLoading}
+          >
+            Grocery
+          </button>
+
+          <button
             onClick={() => selectCategory(3)}
             aria-pressed={selectedType === 3}
             disabled={isLoading}
             >
-            Gas stations
+            Gas Stations
           </button>
         
           <button
