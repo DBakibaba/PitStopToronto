@@ -15,6 +15,7 @@ function App() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const[hasSearched,setHasSearch]=useState<boolean>(false)
   const [activeView, setActiveView] = useState<"list" | "map">("list")
+  const[selectedType,setSelectedType]=useState<number | null>(null)
 
   useEffect(() => {
   
@@ -41,6 +42,46 @@ function App() {
       
   }, [hasSearched])
   
+  async function fetchWashrooms(
+  lat: number,
+  long: number,
+  type: number | null
+) {
+  setIsLoading(true)
+  setErrorMessage("")
+
+  let url =
+    `${apiBaseUrl}/washrooms/nearby?latitude=${lat}&longitude=${long}`
+
+  if (type !== null) {
+    url += `&type=${type}`
+  }
+
+  try {
+    const response = await fetch(url)
+
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.status}`)
+    }
+
+    const data = await response.json()
+    setWashrooms(data)
+    setHasSearch(true)
+  } catch (error) {
+    console.log(error)
+    setErrorMessage("Unable to load washrooms. Please try again.")
+  } finally {
+    setIsLoading(false)
+  }
+}
+  async function selectCategory(type: number | null) {
+    if (latitude === null || longitude === null) {
+      return
+    }
+
+    setSelectedType(type)
+    await fetchWashrooms(latitude, longitude, type)
+  }
   async function loadWashrooms() {
      
     setIsLoading(true)
@@ -58,27 +99,7 @@ function App() {
       setLatitude(lat)
       setLongitude(long)
        
-      try {
-      const response = await fetch(
-          `${apiBaseUrl}/washrooms/nearby?latitude=${lat}&longitude=${long}`
-      )
-
-      if (!response.ok) {
-          throw new Error(`Request failed: ${response.status}`)
-      }
-
-      const data = await response.json()
-      setWashrooms(data)
-      setHasSearch(true)
-      }
-       catch (error) {
-        console.log(error)
-        setErrorMessage("Unable to load washrooms. Please try again.")
-      }   
-        finally {
-        setIsLoading(false)
-      
-      }
+      await fetchWashrooms(lat, long, selectedType)
     },
       (error)=>{
         console.log(error)
@@ -154,6 +175,43 @@ function App() {
       )}
 
       {/* View buttons: visible when there are results */}
+      {hasSearched && (
+        <div className="category-filters">
+          <button
+            onClick={() =>selectCategory(null)}
+            aria-pressed={selectedType===null}
+            disabled={isLoading}
+            > 
+              All
+          </button>
+
+          <button
+            onClick={()=>selectCategory(8)}
+            aria-pressed={selectedType===8}
+            disabled={isLoading}
+            >
+              Coffee
+          </button>
+
+          <button
+            onClick={() => selectCategory(3)}
+            aria-pressed={selectedType === 3}
+            disabled={isLoading}
+            >
+            Gas stations
+          </button>
+        
+          <button
+            onClick={() => selectCategory(6)}
+            aria-pressed={selectedType === 6}
+            disabled={isLoading}
+          >
+            Retail
+          </button>
+          
+        </div>
+      )}
+
       {hasSearched && washrooms.length > 0 && (
         <div className="view-switch">
           <button

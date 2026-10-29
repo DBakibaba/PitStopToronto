@@ -431,3 +431,38 @@
   padding: 8px 12px;
   font-size: 14px;
 }
+
+.category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 600px;
+  margin: 12px auto;
+}
+
+.category-filters button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid #465366;
+  border-radius: 22px;
+  background: transparent;
+  color: #b7c0ce;
+  font: inherit;
+  cursor: pointer;
+}
+
+.category-filters button[aria-pressed="true"] {
+  background: #334155;
+  border-color: #7db7ff;
+  color: #ffffff;
+}
+
+.category-filters button:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.category-filters button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
