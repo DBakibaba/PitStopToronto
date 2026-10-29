@@ -172,7 +172,7 @@ namespace PitStop.API.Services
                     existingLocation.Name = retailStore.Tags.Name;
                     existingLocation.Latitude = latitude.Value;
                     existingLocation.Longitude = longitude.Value;
-                    existingLocation.Type = LocationType.GroceryStore;
+                    existingLocation.Type = LocationType.RetailStore;
                     existingLocation.Hours = retailStore.Tags.OpeningHours;
                     existingLocation.IsActive = true;
                     dbContext.OperatingHours.RemoveRange(existingLocation.OperatingHours);
@@ -190,7 +190,7 @@ namespace PitStop.API.Services
                     ExternalId = externalId,
                     Latitude = latitude.Value,
                     Longitude = longitude.Value,
-                    Type = LocationType.GroceryStore,
+                    Type = LocationType.RetailStore,
                     Status = FacilityStatus.Unknown,
                     Hours = retailStore.Tags.OpeningHours,
                     IsActive = true,
