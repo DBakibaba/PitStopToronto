@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PitStop.API.Data;
 using PitStop.API.Dtos;
-using System.Text.Json;
 using PitStop.API.Models;
+using System.Text.Json;
 using System.Xml.Serialization;
+using static System.Collections.Specialized.BitVector32;
 
 namespace PitStop.API.Services
 {
-    public class OpenStreetMapService(HttpClient httpClient, PitStopDbContext dbContext,OperatingHoursParser operatingHoursParser)
+    public class OpenStreetMapService(HttpClient httpClient, PitStopDbContext dbContext, OperatingHoursParser operatingHoursParser)
     {
         public async Task<(int Imported, int Updated)> GetLoblawsLocationsAsync()
         {
@@ -21,7 +22,7 @@ namespace PitStop.API.Services
                 + Uri.EscapeDataString(query);
 
             var response = await httpClient.GetAsync(url);
-            
+
             response.EnsureSuccessStatusCode();
 
             string json = await response.Content.ReadAsStringAsync();
@@ -34,7 +35,7 @@ namespace PitStop.API.Services
                 throw new InvalidOperationException("OSM returned no response object.");
             }
 
-            var existingLocations = await dbContext.Washrooms.Include(w=>w.OperatingHours)
+            var existingLocations = await dbContext.Washrooms.Include(w => w.OperatingHours)
                 .Where(washroom => washroom.Source == "OpenStreetMap")
                 .ToListAsync();
 
@@ -76,7 +77,7 @@ namespace PitStop.API.Services
                     existingLocation.Longitude = longitude.Value;
                     existingLocation.Type = LocationType.GroceryStore;
                     existingLocation.Hours = supermarket.Tags.OpeningHours;
-                    existingLocation.OperatingHours =operatingHoursParser.ParseOsmHours(supermarket.Tags.OpeningHours);
+                    existingLocation.OperatingHours = operatingHoursParser.ParseOsmHours(supermarket.Tags.OpeningHours);
                     existingLocation.IsActive = true;
 
                     updatedCount++;
@@ -94,7 +95,7 @@ namespace PitStop.API.Services
                     Status = FacilityStatus.Unknown,
                     Hours = supermarket.Tags.OpeningHours,
                     IsActive = true,
-                    OperatingHours =operatingHoursParser.ParseOsmHours(supermarket.Tags.OpeningHours),
+                    OperatingHours = operatingHoursParser.ParseOsmHours(supermarket.Tags.OpeningHours),
                 };
 
                 dbContext.Washrooms.Add(washroom);
@@ -135,7 +136,7 @@ namespace PitStop.API.Services
                 throw new InvalidOperationException("OSM returned no response object.");
             }
 
-            var existingLocations = await dbContext.Washrooms.Include(w=>w.OperatingHours)
+            var existingLocations = await dbContext.Washrooms.Include(w => w.OperatingHours)
                 .Where(washroom => washroom.Source == "OpenStreetMap")
                 .ToListAsync();
 
@@ -232,7 +233,7 @@ namespace PitStop.API.Services
                 throw new InvalidOperationException("OSM returned no response object.");
             }
 
-            var existingLocations = await dbContext.Washrooms.Include(w=>w.OperatingHours)
+            var existingLocations = await dbContext.Washrooms.Include(w => w.OperatingHours)
                 .Where(washroom => washroom.Source == "OpenStreetMap")
                 .ToListAsync();
 
@@ -275,7 +276,7 @@ namespace PitStop.API.Services
                     existingLocation.Hours = retailStore.Tags.OpeningHours;
                     existingLocation.IsActive = true;
                     dbContext.OperatingHours.RemoveRange(existingLocation.OperatingHours);
-                    existingLocation.OperatingHours =operatingHoursParser.ParseOsmHours(retailStore.Tags.OpeningHours);
+                    existingLocation.OperatingHours = operatingHoursParser.ParseOsmHours(retailStore.Tags.OpeningHours);
 
                     updatedCount++;
                     continue;
@@ -292,7 +293,7 @@ namespace PitStop.API.Services
                     Status = FacilityStatus.Unknown,
                     Hours = retailStore.Tags.OpeningHours,
                     IsActive = true,
-                    OperatingHours =operatingHoursParser.ParseOsmHours(retailStore.Tags.OpeningHours),
+                    OperatingHours = operatingHoursParser.ParseOsmHours(retailStore.Tags.OpeningHours),
                 };
 
                 dbContext.Washrooms.Add(washroom);
@@ -332,7 +333,7 @@ namespace PitStop.API.Services
                 throw new InvalidOperationException("OSM returned no response object.");
             }
 
-            var existingLocations = await dbContext.Washrooms.Include(w=>w.OperatingHours)
+            var existingLocations = await dbContext.Washrooms.Include(w => w.OperatingHours)
                 .Where(washroom => washroom.Source == "OpenStreetMap")
                 .ToListAsync();
 
@@ -374,7 +375,7 @@ namespace PitStop.API.Services
                     existingLocation.Hours = cafe.Tags.OpeningHours;
                     existingLocation.IsActive = true;
                     dbContext.OperatingHours.RemoveRange(existingLocation.OperatingHours);
-                    existingLocation.OperatingHours =operatingHoursParser.ParseOsmHours(cafe.Tags.OpeningHours);
+                    existingLocation.OperatingHours = operatingHoursParser.ParseOsmHours(cafe.Tags.OpeningHours);
 
                     updatedCount++;
                     continue;
@@ -391,7 +392,7 @@ namespace PitStop.API.Services
                     Status = FacilityStatus.Unknown,
                     Hours = cafe.Tags.OpeningHours,
                     IsActive = true,
-                    OperatingHours =operatingHoursParser.ParseOsmHours(cafe.Tags.OpeningHours),
+                    OperatingHours = operatingHoursParser.ParseOsmHours(cafe.Tags.OpeningHours),
                 };
 
                 dbContext.Washrooms.Add(washroom);
@@ -433,7 +434,7 @@ namespace PitStop.API.Services
                 throw new InvalidOperationException("OSM returned no response object.");
             }
 
-            var existingLocations = await dbContext.Washrooms.Include(w=>w.OperatingHours)
+            var existingLocations = await dbContext.Washrooms.Include(w => w.OperatingHours)
                 .Where(washroom => washroom.Source == "OpenStreetMap")
                 .ToListAsync();
 
@@ -475,7 +476,7 @@ namespace PitStop.API.Services
                     existingLocation.Hours = restaurant.Tags.OpeningHours;
                     existingLocation.IsActive = true;
                     dbContext.OperatingHours.RemoveRange(existingLocation.OperatingHours);
-                    existingLocation.OperatingHours =operatingHoursParser.ParseOsmHours(restaurant.Tags.OpeningHours);
+                    existingLocation.OperatingHours = operatingHoursParser.ParseOsmHours(restaurant.Tags.OpeningHours);
 
 
                     updatedCount++;
@@ -493,7 +494,211 @@ namespace PitStop.API.Services
                     Status = FacilityStatus.Unknown,
                     Hours = restaurant.Tags.OpeningHours,
                     IsActive = true,
-                    OperatingHours =operatingHoursParser.ParseOsmHours(restaurant.Tags.OpeningHours),
+                    OperatingHours = operatingHoursParser.ParseOsmHours(restaurant.Tags.OpeningHours),
+                };
+
+                dbContext.Washrooms.Add(washroom);
+                existingLocations.Add(washroom);
+
+                importedCount++;
+            }
+
+            await dbContext.SaveChangesAsync();
+
+            return (importedCount, updatedCount);
+        }
+
+
+
+        public async Task<(int Imported, int Updated)> GetStarbucksLocationsAsync()
+        {
+            string query = """
+            [out:json][timeout:25];
+            (
+                nwr["name"="Starbucks"]["outdoor_seating"="yes"](around:200000,43.7001,-79.4163);
+                nwr["name"="Starbucks"]["drive_through"="yes"](around:200000,43.7001,-79.4163);
+            );
+            out center;
+            """;
+
+            string url = "https://overpass-api.de/api/interpreter?data="
+                + Uri.EscapeDataString(query);
+
+            var response = await httpClient.GetAsync(url);
+
+            string json = await response.Content.ReadAsStringAsync();
+
+            response.EnsureSuccessStatusCode();
+
+            var osmResponse =
+                JsonSerializer.Deserialize<OpenStreetMapResponseDto>(json);
+
+            if (osmResponse is null)
+            {
+                throw new InvalidOperationException("OSM returned no response object.");
+            }
+
+            var existingLocations = await dbContext.Washrooms.Include(w => w.OperatingHours)
+                .Where(washroom => washroom.Source == "OpenStreetMap")
+                .ToListAsync();
+
+            int importedCount = 0;
+            int updatedCount = 0;
+
+            foreach (var cafe in osmResponse.Elements)
+            {
+                double? latitude = cafe.Lat;
+                double? longitude = cafe.Lon;
+
+                if (!latitude.HasValue || !longitude.HasValue)
+                {
+                    latitude = cafe.Center?.Lat;
+                    longitude = cafe.Center?.Lon;
+                }
+
+                if (!latitude.HasValue || !longitude.HasValue)
+                {
+                    continue;
+                }
+
+                if (cafe.Tags is null)
+                {
+                    continue;
+                }
+
+                string externalId = $"{cafe.Type}/{cafe.Id}";
+
+                var existingLocation = existingLocations.FirstOrDefault(
+                    washroom => washroom.ExternalId == externalId);
+
+                if (existingLocation is not null)
+                {
+                    existingLocation.Name = cafe.Tags.Name ?? "Starbucks";
+                    existingLocation.Latitude = latitude.Value;
+                    existingLocation.Longitude = longitude.Value;
+                    existingLocation.Type = LocationType.Coffee;
+                    existingLocation.Hours = cafe.Tags.OpeningHours;
+                    existingLocation.IsActive = true;
+                    dbContext.OperatingHours.RemoveRange(existingLocation.OperatingHours);
+                    existingLocation.OperatingHours = operatingHoursParser.ParseOsmHours(cafe.Tags.OpeningHours);
+
+                    updatedCount++;
+                    continue;
+                }
+
+                var washroom = new Washroom
+                {
+                    Name = cafe.Tags.Name ?? "Starbucks",
+                    Source = "OpenStreetMap",
+                    ExternalId = externalId,
+                    Latitude = latitude.Value,
+                    Longitude = longitude.Value,
+                    Type = LocationType.Coffee,
+                    Status = FacilityStatus.Unknown,
+                    Hours = cafe.Tags.OpeningHours,
+                    IsActive = true,
+                    OperatingHours = operatingHoursParser.ParseOsmHours(cafe.Tags.OpeningHours),
+                };
+
+                dbContext.Washrooms.Add(washroom);
+                existingLocations.Add(washroom);
+
+                importedCount++;
+            }
+
+            await dbContext.SaveChangesAsync();
+
+            return (importedCount, updatedCount);
+        }
+
+
+
+        public async Task<(int Imported, int Updated)> GetGasStationsAsync()
+        {
+            string query = """
+                [out:json][timeout:60];
+                (
+                    nwr["amenity"="fuel"](around:200000,43.7001,-79.4163);
+                );
+                out center;
+                """;
+
+            string url = "https://overpass-api.de/api/interpreter?data="
+                + Uri.EscapeDataString(query);
+
+            var response = await httpClient.GetAsync(url);
+
+            string json = await response.Content.ReadAsStringAsync();
+
+            response.EnsureSuccessStatusCode();
+
+            var osmResponse =
+                JsonSerializer.Deserialize<OpenStreetMapResponseDto>(json);
+
+            if (osmResponse is null)
+            {
+                throw new InvalidOperationException("OSM returned no response object.");
+            }
+
+            var existingLocations = await dbContext.Washrooms.Include(w => w.OperatingHours)
+                .Where(washroom => washroom.Source == "OpenStreetMap")
+                .ToListAsync();
+
+            int importedCount = 0;
+            int updatedCount = 0;
+
+            foreach (var station in osmResponse.Elements)
+            {
+                double? latitude = station.Lat;
+                double? longitude = station.Lon;
+
+                if (!latitude.HasValue || !longitude.HasValue)
+                {
+                    latitude = station.Center?.Lat;
+                    longitude = station.Center?.Lon;
+                }
+
+                if (!latitude.HasValue || !longitude.HasValue)
+                {
+                    continue;
+                }
+
+                if (station.Tags is null)
+                {
+                    continue;
+                }
+
+                string externalId = $"{station.Type}/{station.Id}";
+
+                var existingLocation = existingLocations.FirstOrDefault(
+                    washroom => washroom.ExternalId == externalId);
+
+                if (existingLocation is not null)
+                {
+                    existingLocation.Name = station.Tags.Brand ?? station.Tags.Name ?? "Gas station";
+                    existingLocation.Latitude = latitude.Value;
+                    existingLocation.Longitude = longitude.Value;
+                    existingLocation.Type = LocationType.GasStation;
+                    existingLocation.IsActive = true;
+                    dbContext.OperatingHours.RemoveRange(existingLocation.OperatingHours);
+                    existingLocation.OperatingHours = operatingHoursParser.ParseOsmHours(station.Tags.OpeningHours);
+
+                    updatedCount++;
+                    continue;
+                }
+
+                var washroom = new Washroom
+                {
+                    Name = station.Tags.Brand ?? station.Tags.Name ?? "Gas station",
+                    Source = "OpenStreetMap",
+                    ExternalId = externalId,
+                    Latitude = latitude.Value,
+                    Longitude = longitude.Value,
+                    Type = LocationType.GasStation,
+                    Status = FacilityStatus.Unknown,
+                    Hours = station.Tags.OpeningHours,
+                    IsActive = true,
+                    OperatingHours = operatingHoursParser.ParseOsmHours(station.Tags.OpeningHours),
                 };
 
                 dbContext.Washrooms.Add(washroom);
@@ -507,5 +712,7 @@ namespace PitStop.API.Services
             return (importedCount, updatedCount);
         }
     }
-}                                                       
+
+}
+                                                   
     

@@ -11,29 +11,31 @@ public static class WashroomEndpoints
     {
         var group = app.MapGroup("/washrooms");
 
-        group.MapGet("/", async (WashroomService washroomService) => {
+        group.MapGet("/", async (WashroomService washroomService) =>
+        {
 
             var washrooms = await washroomService.GetAllWashroomsAsync();
             return Results.Ok(new
             {
-                Count=washrooms.Count,
-                Washrooms=washrooms
+                Count = washrooms.Count,
+                Washrooms = washrooms
             });
 
         });
-        
-        
-        
-        group.MapGet("/nearby", async ( double latitude, double longitude,LocationType? type,WashroomService washroomService) =>{
-     
+
+
+
+        group.MapGet("/nearby", async (double latitude, double longitude, LocationType? type, WashroomService washroomService) =>
+        {
+
             if (latitude < -90 || latitude > 90)
-             {
-                 return Results.BadRequest("Latitude must be between -90 and 90.");
-             }
+            {
+                return Results.BadRequest("Latitude must be between -90 and 90.");
+            }
             if (longitude < -180 || longitude > 180)
-             {
-                 return Results.BadRequest("Longitude must be between -180 and 180.");
-             }
+            {
+                return Results.BadRequest("Longitude must be between -180 and 180.");
+            }
 
             var nearbyWashrooms = await washroomService.GetNearByAsync(
                  latitude,
@@ -41,9 +43,9 @@ public static class WashroomEndpoints
                  type
             );
 
-     return Results.Ok(nearbyWashrooms);
- }).RequireRateLimiting("nearby");
-        
+            return Results.Ok(nearbyWashrooms);
+        }).RequireRateLimiting("nearby");
+
         if (app.Environment.IsDevelopment())
         {
             group.MapPost("/import-toronto", async (TorontoWashroomService torontoWashroomService) =>
@@ -67,7 +69,7 @@ public static class WashroomEndpoints
 
             });
 
-        
+
 
 
             group.MapPost("/import-osm-loblaws", async (OpenStreetMapService service) =>
@@ -81,7 +83,7 @@ public static class WashroomEndpoints
                 });
             });
 
-            group.MapPost("/import-osm-home-depot",async(OpenStreetMapService service) =>
+            group.MapPost("/import-osm-home-depot", async (OpenStreetMapService service) =>
             {
                 var result = await service.GetHomeDepotLocationAsync();
 
@@ -127,6 +129,29 @@ public static class WashroomEndpoints
                 });
             });
 
+            group.MapPost("/import-osm-starbucks", async (OpenStreetMapService service) =>
+            {
+                var result = await service.GetStarbucksLocationsAsync();
+
+                return Results.Ok(new
+                {
+                    imported = result.Imported,
+                    updated = result.Updated
+                });
+            });
+
+
+            group.MapPost("/import-osm-gasStation", async (OpenStreetMapService service) =>
+            {
+                var result = await service.GetGasStationsAsync();
+
+                return Results.Ok(new
+                {
+                    imported = result.Imported,
+                    updated = result.Updated
+                });
+            });
+
             group.MapPost("/import-osm-all", async (OpenStreetMapService service) =>
             {
                 var loblaws = await service.GetLoblawsLocationsAsync();
@@ -143,6 +168,8 @@ public static class WashroomEndpoints
                             + timHortons.Updated + mcDonalds.Updated
                 });
             });
+
+
 
         }
     }
