@@ -72,9 +72,9 @@ public static class WashroomEndpoints
 
 
 
-            group.MapPost("/import-osm-loblaws", async (OpenStreetMapService service) =>
+            group.MapPost("/import-osm-supermarket", async (OpenStreetMapService service) =>
             {
-                var result = await service.GetLoblawsLocationsAsync();
+                var result = await service.GetSupermarketsLocationsAsync();
 
                 return Results.Ok(new
                 {
@@ -152,22 +152,22 @@ public static class WashroomEndpoints
                 });
             });
 
-            group.MapPost("/import-osm-all", async (OpenStreetMapService service) =>
-            {
-                var loblaws = await service.GetLoblawsLocationsAsync();
-                var homeDepot = await service.GetHomeDepotLocationAsync();
-                var canadianTire = await service.GetCanadianTireLocationsAsync();
-                var timHortons = await service.GetTimHortonsLocationsAsync();
-                var mcDonalds = await service.GetMcDonaldsLocationsAsync();
+            //group.MapPost("/import-osm-all", async (OpenStreetMapService service) =>
+            //{
+                 
+            //    var homeDepot = await service.GetHomeDepotLocationAsync();
+            //    var canadianTire = await service.GetCanadianTireLocationsAsync();
+            //    var timHortons = await service.GetTimHortonsLocationsAsync();
+            //    var mcDonalds = await service.GetMcDonaldsLocationsAsync();
 
-                return Results.Ok(new
-                {
-                    imported = loblaws.Imported + homeDepot.Imported + canadianTire.Imported
-                             + timHortons.Imported + mcDonalds.Imported,
-                    updated = loblaws.Updated + homeDepot.Updated + canadianTire.Updated
-                            + timHortons.Updated + mcDonalds.Updated
-                });
-            });
+            //    return Results.Ok(new
+            //    {
+            //        imported = loblaws.Imported + homeDepot.Imported + canadianTire.Imported
+            //                 + timHortons.Imported + mcDonalds.Imported,
+            //        updated = loblaws.Updated + homeDepot.Updated + canadianTire.Updated
+            //                + timHortons.Updated + mcDonalds.Updated
+            //    });
+            //});
 
 
 

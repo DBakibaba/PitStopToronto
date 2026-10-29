@@ -10,11 +10,11 @@ namespace PitStop.API.Services
 {
     public class OpenStreetMapService(HttpClient httpClient, PitStopDbContext dbContext, OperatingHoursParser operatingHoursParser)
     {
-        public async Task<(int Imported, int Updated)> GetLoblawsLocationsAsync()
+        public async Task<(int Imported, int Updated)> GetSupermarketsLocationsAsync()
         {
             string query = """
-        [out:json][timeout:25];
-        nwr["shop"="supermarket"]["name"="Loblaws"](around:200000,43.7001,-79.4163);
+        [out:json][timeout:60];
+        nwr["shop"="supermarket"]["brand"~"Loblaws|Real Canadian Superstore|Metro|Sobeys|FreshCo|No Frills|Food Basics|Walmart"](around:200000,43.7001,-79.4163);
         out center;
         """;
 
@@ -72,7 +72,8 @@ namespace PitStop.API.Services
 
                 if (existingLocation is not null)
                 {
-                    existingLocation.Name = supermarket.Tags.Name;
+                     
+                    existingLocation.Name = supermarket.Tags.Brand ?? supermarket.Tags.Name ?? "supermarket";
                     existingLocation.Latitude = latitude.Value;
                     existingLocation.Longitude = longitude.Value;
                     existingLocation.Type = LocationType.GroceryStore;
@@ -86,7 +87,7 @@ namespace PitStop.API.Services
 
                 var washroom = new Washroom
                 {
-                    Name = supermarket.Tags.Name,
+                    Name = supermarket.Tags.Brand ?? supermarket.Tags.Name ?? "supermarket",
                     Source = "OpenStreetMap",
                     ExternalId = externalId,
                     Latitude = latitude.Value,
