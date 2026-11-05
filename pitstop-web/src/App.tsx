@@ -16,7 +16,28 @@ function App() {
   const[hasSearched,setHasSearch]=useState<boolean>(false)
   const [activeView, setActiveView] = useState<"list" | "map">("list")
   const[selectedType,setSelectedType]=useState<number | null>(null)
+  const [keyInput, setKeyInput] = useState("");
 
+const showAdminBox = new URLSearchParams(window.location.search).has("admin");
+
+const [adminKey, setAdminKey] = useState<string | null>(
+    () => localStorage.getItem("pitstopAdminKey")
+);
+
+function saveAdminKey() {
+    const key = keyInput.trim();
+    if (!key) {
+        return;
+    }
+    localStorage.setItem("pitstopAdminKey", key);
+    setAdminKey(key);
+    setKeyInput("");
+}
+
+function logOutAdmin() {
+    localStorage.removeItem("pitstopAdminKey");
+    setAdminKey(null);
+}
   useEffect(() => {
   
     if(!hasSearched){
@@ -36,6 +57,8 @@ function App() {
   
    {enableHighAccuracy:true}
     )
+
+
     return()=>{
       navigator.geolocation.clearWatch(watchId)
     }
@@ -109,7 +132,7 @@ function App() {
     )
   }
   let searchButtonText = "Find Washrooms"
-
+  
   if (isLoading) {
     searchButtonText = "Finding washrooms..."
   } else if (hasSearched) {
@@ -117,8 +140,44 @@ function App() {
   }
 
 
+
+  if (showAdminBox) {
+  return (
+    <div className="admin-panel">
+      <h1>PitStop Admin</h1>
+
+      {adminKey === null ? (
+        <div>
+          <label htmlFor="admin-key">Admin key</label>
+
+          <input
+            id="admin-key"
+            type="password"
+            value={keyInput}
+            onChange={(event) => setKeyInput(event.target.value)}
+          />
+
+          <button onClick={saveAdminKey}>
+            Enter admin mode
+          </button>
+        </div>
+      ) : (
+        <div>
+          <p>Admin mode is active.</p>
+
+          <button onClick={logOutAdmin}>
+            Log out
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
    return (
         <div>
+          {showAdminBox && <p>Admin</p>}
+
           {hasSearched ? (
       <header className="results-header">
         <h1>PitStop</h1>
