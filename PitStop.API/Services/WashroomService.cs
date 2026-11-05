@@ -155,4 +155,25 @@ public class WashroomService(PitStopDbContext dbContext)
         return $"Open until {close.ToString("h:mm tt")}";
     }
 
+
+    public async Task<int> AddPortableToiletAsync(double latitude,double longitude)
+    {
+        var washroom = new Washroom
+        {
+            Name = "Portable toilet",
+            Source = "Manual",
+            ExternalId = $"manual:{Guid.NewGuid()}",
+            Latitude = latitude,
+            Longitude = longitude,
+            Type = LocationType.PortableToilet,
+            Status = FacilityStatus.Unknown,
+            IsActive = true,
+        };
+
+        dbContext.Washrooms.Add(washroom);
+        await dbContext.SaveChangesAsync();
+
+        return washroom.Id;
+
+    }
 }
