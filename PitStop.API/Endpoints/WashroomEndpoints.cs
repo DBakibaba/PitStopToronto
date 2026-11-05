@@ -1,7 +1,8 @@
 using PitStop.API.Models;
 using PitStop.API.Services;
-
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PitStop.API.Dtos;
 namespace PitStop.API.Endpoints;
 
 public static class WashroomEndpoints
@@ -172,5 +173,22 @@ public static class WashroomEndpoints
 
 
         }
+
+
+        group.MapPost("/portable", async (AddPortableToiletRequest request,
+            [FromHeader(Name = "X-Admin-Key")] string? adminKey,
+            IConfiguration configuration, WashroomService washroomService) =>
+        {
+            string? expectedKey = configuration["AdminApiKey"];
+
+            if(string.IsNullOrEmpty(expectedKey) || adminKey != expectedKey)
+            {
+                return Results.Unauthorized();
+            }
+
+            int newId = await washroomService.AddPortableToiletAsync(request.Latitude, request.Longitude);
+            
+            return Results.Created($"/washrooms/{newId}", new { id = newId });
+        });
     }
 }
