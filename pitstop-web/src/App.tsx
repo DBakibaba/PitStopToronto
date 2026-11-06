@@ -4,6 +4,7 @@ import type { Washroom } from "./types/Washroom"
 import './App.css'
 import torontoSkyline from "./assets/toronto-skyline.png"
 import { useState, useEffect } from "react"
+import exifr from "exifr"
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
@@ -17,14 +18,15 @@ function App() {
   const [activeView, setActiveView] = useState<"list" | "map">("list")
   const[selectedType,setSelectedType]=useState<number | null>(null)
   const [keyInput, setKeyInput] = useState("");
+  const showAdminBox = new URLSearchParams(window.location.search).has("admin");
+  const [adminKey, setAdminKey] = useState<string | null>(
+      () => localStorage.getItem("pitstopAdminKey")
+  );
+  const [portableLatitude, setPortableLatitude] =useState<number | null>(null)
+  const [portableLongitude, setPortableLongitude] =useState<number | null>(null)
+  const [needsLocationChoice, setNeedsLocationChoice] =useState<boolean>(false)
 
-const showAdminBox = new URLSearchParams(window.location.search).has("admin");
-
-const [adminKey, setAdminKey] = useState<string | null>(
-    () => localStorage.getItem("pitstopAdminKey")
-);
-
-function saveAdminKey() {
+  function saveAdminKey() {
     const key = keyInput.trim();
     if (!key) {
         return;
@@ -38,6 +40,54 @@ function logOutAdmin() {
     localStorage.removeItem("pitstopAdminKey");
     setAdminKey(null);
 }
+function addPortableToilet() {
+  navigator.geolocation.getCurrentPosition(
+    (position)=>{
+      const lat=position.coords.latitude
+      const long=position.coords.longitude
+
+      console.log("Portable washroom location:", lat, long)
+    },
+    (error)=>{ console.error("Unable to get location:", error.message)
+    },{
+      enableHighAccuracy:true
+    }
+  )
+}
+async function readPhotoLocation(
+  event: React.ChangeEvent<HTMLInputElement>
+) {
+  const file = event.target.files?.[0]
+
+  if (!file) {
+    return
+  }
+
+  try {
+    const gps = await exifr.gps(file)
+
+    if (gps) {
+      setPortableLatitude(gps.latitude)
+      setPortableLongitude(gps.longitude)
+      setNeedsLocationChoice(false)
+
+      console.log("Photo location:", gps.latitude, gps.longitude)
+    } else {
+      setPortableLatitude(null)
+      setPortableLongitude(null)
+      setNeedsLocationChoice(true)
+
+      console.log("This photo does not contain GPS data.")
+    }
+  } catch (error) {
+    console.error("Could not read photo metadata:", error)
+
+    setPortableLatitude(null)
+    setPortableLongitude(null)
+    setNeedsLocationChoice(true)
+  }
+}
+
   useEffect(() => {
   
     if(!hasSearched){
@@ -156,6 +206,19 @@ function logOutAdmin() {
             value={keyInput}
             onChange={(event) => setKeyInput(event.target.value)}
           />
+          {portableLatitude !== null && portableLongitude !== null && (
+          <div>
+            <p>Photo location found.</p>
+            <p>Latitude: {portableLatitude}</p>
+            <p>Longitude: {portableLongitude}</p>
+          </div>
+        )}
+
+        {needsLocationChoice && (
+          <p>
+            This photo does not contain GPS data. Choose another location method.
+          </p>
+        )}
 
           <button onClick={saveAdminKey}>
             Enter admin mode
@@ -163,17 +226,31 @@ function logOutAdmin() {
         </div>
       ) : (
         <div>
+
           <p>Admin mode is active.</p>
 
+          <label htmlFor="portable-photo">
+            Choose a portable washroom photo
+          </label>
+
+          <input
+            id="portable-photo"
+            type="file"
+            accept="image/*"
+            onChange={readPhotoLocation}
+          />
+          <button onClick={addPortableToilet}>
+            Add portable washroom
+          </button>
           <button onClick={logOutAdmin}>
             Log out
           </button>
+          
         </div>
       )}
     </div>
   )
 }
-
    return (
         <div>
           {showAdminBox && <p>Admin</p>}
