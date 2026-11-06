@@ -21,6 +21,7 @@ function App() {
   const [adminKey, setAdminKey] = useState<string | null>(() =>
     localStorage.getItem("pitstopAdminKey"),
   );
+  const [adminMessage, setAdminMessage] = useState<string>("");
   const [portableLatitude, setPortableLatitude] = useState<number | null>(null);
   const [portableLongitude, setPortableLongitude] = useState<number | null>(
     null,
@@ -42,21 +43,37 @@ function App() {
     localStorage.removeItem("pitstopAdminKey");
     setAdminKey(null);
   }
-  function addPortableToilet() {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const long = position.coords.longitude;
 
-        console.log("Portable washroom location:", lat, long);
-      },
-      (error) => {
-        console.error("Unable to get location:", error.message);
-      },
-      {
-        enableHighAccuracy: true,
-      },
-    );
+  async function addPortableToilet() {
+    if (portableLatitude === null || portableLongitude === null || !adminKey) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/washrooms/portable`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Admin-Key": adminKey,
+        },
+        body: JSON.stringify({
+          latitude: portableLatitude,
+          longitude: portableLongitude,
+        }),
+      });
+
+      if (response.status === 401) {
+        setAdminMessage("Wrong admin key.");
+        return;
+      }
+      if (!response.ok) {
+        setAdminMessage(`Something went wrong (${response.status}).`);
+        return;
+      }
+      setAdminMessage("Saved ✓");
+    } catch (error) {
+      setAdminMessage("Could not reach the server.");
+    }
   }
   function handleLivePhoto(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -286,6 +303,8 @@ function App() {
               >
                 Add portable washroom
               </button>
+
+              {adminMessage && <p>{adminMessage}</p>}
 
               <button onClick={logOutAdmin}>Log out</button>
             </div>
