@@ -70,7 +70,8 @@ function App() {
         setAdminMessage(`Something went wrong (${response.status}).`);
         return;
       }
-      setAdminMessage("Saved ✓");
+      const data = await response.json();
+      setAdminMessage(`Saved  ✓ Id: ${data.id}`);
     } catch (error) {
       setAdminMessage("Could not reach the server.");
     }
