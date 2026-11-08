@@ -6,6 +6,11 @@ import { useState, useEffect } from "react";
 import exifr from "exifr";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+type WaitingToilet = {
+  id: number;
+  latitude: number;
+  longitude: number;
+};
 
 function App() {
   const [washrooms, setWashrooms] = useState<Washroom[]>([]);
@@ -28,6 +33,7 @@ function App() {
   );
   const [needsLocationChoice, setNeedsLocationChoice] =
     useState<boolean>(false);
+  const [waitingToilets, setWaitingToilets] = useState<WaitingToilet[]>([]);
 
   function saveAdminKey() {
     const key = keyInput.trim();
@@ -72,10 +78,65 @@ function App() {
       }
       const data = await response.json();
       setAdminMessage(`Saved  ✓ Id: ${data.id}`);
+      await loadWaitingToilets();
     } catch (error) {
       setAdminMessage("Could not reach the server.");
     }
   }
+  async function loadWaitingToilets() {
+    if (!adminKey) {
+      return;
+    }
+
+    const response = await fetch(`${apiBaseUrl}/washrooms/waiting`, {
+      headers: { "X-Admin-Key": adminKey },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setWaitingToilets(data);
+    }
+  }
+
+  async function approveToilet(id: number) {
+    if (!adminKey) {
+      return;
+    }
+
+    const response = await fetch(`${apiBaseUrl}/washrooms/${id}/approve`, {
+      method: "POST",
+      headers: { "X-Admin-Key": adminKey },
+    });
+
+    if (response.ok) {
+      setAdminMessage(`Approved ✓ Id: ${id}`);
+      await loadWaitingToilets();
+    } else {
+      setAdminMessage(`Approve failed (${response.status}).`);
+    }
+  }
+
+  async function rejectToilet(id: number) {
+    if (!adminKey) {
+      return;
+    }
+    if (!window.confirm(`Reject and delete Id ${id}?`)) {
+      return;
+    }
+
+    const response = await fetch(`${apiBaseUrl}/washrooms/${id}/reject`, {
+      method: "POST",
+      headers: { "X-Admin-Key": adminKey },
+    });
+
+    if (response.ok) {
+      setAdminMessage(`Rejected ✓ Id: ${id}`);
+      await loadWaitingToilets();
+    } else {
+      setAdminMessage(`Reject failed (${response.status}).`);
+    }
+  }
+
   function handleLivePhoto(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
 
@@ -151,6 +212,12 @@ function App() {
       navigator.geolocation.clearWatch(watchId);
     };
   }, [hasSearched]);
+
+  useEffect(() => {
+    if (showAdminBox && adminKey) {
+      loadWaitingToilets();
+    }
+  }, [adminKey]);
 
   async function fetchWashrooms(
     lat: number,
@@ -309,6 +376,37 @@ function App() {
 
               <button onClick={logOutAdmin}>Log out</button>
             </div>
+
+            <section className="waiting-list">
+              <h2>Waiting for review</h2>
+
+              {waitingToilets.length === 0 && <p>Nothing waiting.</p>}
+
+              {waitingToilets.map((toilet) => (
+                <div key={toilet.id} className="waiting-item">
+                  <p>Id: {toilet.id}</p>
+                  <a
+                    href={`https://www.google.com/maps?q=${toilet.latitude},${toilet.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View on map
+                  </a>
+                  <button
+                    className="approve-button"
+                    onClick={() => approveToilet(toilet.id)}
+                  >
+                    Approve
+                  </button>
+                  <button
+                    className="reject-button"
+                    onClick={() => rejectToilet(toilet.id)}
+                  >
+                    Reject
+                  </button>
+                </div>
+              ))}
+            </section>
           </div>
         )}
       </div>
