@@ -152,26 +152,6 @@ public static class WashroomEndpoints
                     updated = result.Updated
                 });
             });
-
-            //group.MapPost("/import-osm-all", async (OpenStreetMapService service) =>
-            //{
-                 
-            //    var homeDepot = await service.GetHomeDepotLocationAsync();
-            //    var canadianTire = await service.GetCanadianTireLocationsAsync();
-            //    var timHortons = await service.GetTimHortonsLocationsAsync();
-            //    var mcDonalds = await service.GetMcDonaldsLocationsAsync();
-
-            //    return Results.Ok(new
-            //    {
-            //        imported = loblaws.Imported + homeDepot.Imported + canadianTire.Imported
-            //                 + timHortons.Imported + mcDonalds.Imported,
-            //        updated = loblaws.Updated + homeDepot.Updated + canadianTire.Updated
-            //                + timHortons.Updated + mcDonalds.Updated
-            //    });
-            //});
-
-
-
         }
 
 
@@ -190,5 +170,57 @@ public static class WashroomEndpoints
             
             return Results.Created($"/washrooms/{newId}", new { id = newId });
         });
+
+        group.MapGet("/waiting", async (
+            [FromHeader(Name = "X-Admin-Key")] string? adminKey,
+            IConfiguration configuration,
+            WashroomService washroomService) =>
+        {
+            string? expectedKey = configuration["AdminApiKey"];
+
+            if (string.IsNullOrEmpty(expectedKey) || adminKey != expectedKey)
+            {
+                return Results.Unauthorized();
+            }
+
+            var waiting = await washroomService.GetWaitingToiletsAsync();
+            return Results.Ok(waiting);
+        });
+        group.MapPost("/{id:int}/approve", async (
+            int id,
+            [FromHeader(Name = "X-Admin-Key")] string? adminKey,
+            IConfiguration configuration,
+            WashroomService washroomService) =>
+        {
+            if (!IsAdmin(adminKey, configuration))
+            {
+                return Results.Unauthorized();
+            }
+
+            bool approved = await washroomService.ApproveToiletAsync(id);
+            return approved ? Results.Ok() : Results.NotFound();
+        });
+
+        group.MapPost("/{id:int}/reject", async (
+            int id,
+            [FromHeader(Name = "X-Admin-Key")] string? adminKey,
+            IConfiguration configuration,
+            WashroomService washroomService) =>
+        {
+            if (!IsAdmin(adminKey, configuration))
+            {
+                return Results.Unauthorized();
+            }
+
+            bool rejected = await washroomService.RejectToiletAsync(id);
+            return rejected ? Results.Ok() : Results.NotFound();
+        });
+
+    }
+
+    private static bool IsAdmin(string? adminKey, IConfiguration configuration)
+    {
+        string? expectedKey = configuration["AdminApiKey"];
+        return !string.IsNullOrEmpty(expectedKey) && adminKey == expectedKey;
     }
 }

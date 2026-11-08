@@ -167,7 +167,7 @@ public class WashroomService(PitStopDbContext dbContext)
             Longitude = longitude,
             Type = LocationType.PortableToilet,
             Status = FacilityStatus.Unknown,
-            IsActive = true,
+            IsActive = false,
         };
 
         dbContext.Washrooms.Add(washroom);
@@ -176,4 +176,44 @@ public class WashroomService(PitStopDbContext dbContext)
         return washroom.Id;
 
     }
+
+    public async Task<List<WaitingToiletDto>> GetWaitingToiletsAsync()
+    {
+        return await dbContext.Washrooms
+            .Where(w => w.Source == "Manual" && !w.IsActive)
+            .OrderByDescending(w => w.Id)
+            .Select(w => new WaitingToiletDto(w.Id, w.Latitude, w.Longitude))
+            .ToListAsync();
+    }
+
+    public async Task<bool> ApproveToiletAsync(int id)
+    {
+        var washroom = await dbContext.Washrooms
+            .FirstOrDefaultAsync(w => w.Id == id && w.Source == "Manual" && !w.IsActive);
+
+        if (washroom is null)
+        {
+            return false;
+        }
+
+        washroom.IsActive = true;
+        await dbContext.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> RejectToiletAsync(int id)
+    {
+        var washroom = await dbContext.Washrooms
+            .FirstOrDefaultAsync(w => w.Id == id && w.Source == "Manual" && !w.IsActive);
+
+        if (washroom is null)
+        {
+            return false;
+        }
+
+        dbContext.Washrooms.Remove(washroom);
+        await dbContext.SaveChangesAsync();
+        return true;
+    }
+
 }
