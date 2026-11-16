@@ -262,6 +262,11 @@ function App() {
     setIsLoading(true);
     setErrorMessage("");
 
+    if (hasSearched && latitude !== null && longitude !== null) {
+      await fetchWashrooms(latitude, longitude, selectedType);
+      return;
+    }
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const lat = position.coords.latitude;
@@ -279,6 +284,11 @@ function App() {
           "Location permission is required to find nearby washrooms.",
         );
         setIsLoading(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 30000,
       },
     );
   }
