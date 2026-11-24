@@ -138,7 +138,7 @@ namespace PitStop.API.Tests
             Assert.Empty(result);
         }
 
-      
+
 
         [Fact]
         public void ParseOsmHours_DayRangeAndTime_ReturnsCorrectRows()
@@ -173,7 +173,7 @@ namespace PitStop.API.Tests
             Assert.All(result, row => Assert.Equal(new TimeOnly(0, 0), row.CloseTime));
         }
 
-       
+
 
         [Fact]
         public void ParseOsmHours_CommaListOfDays_ReturnsThoseDays()
@@ -252,5 +252,66 @@ namespace PitStop.API.Tests
 
             Assert.Empty(result);
         }
+    }
+
+    public class DistanceCalculatorTests
+    {
+        [Fact]
+        public void CalculateDistanceKm_SameCoordinates_ReturnsZero()
+        {
+            double result = DistanceCalculator.CalculateDistanceKm(
+                43.7001, -79.4163,
+                43.7001, -79.4163
+            );
+
+            Assert.Equal(0, result);
+        }
+
+        [Fact]
+        public void CalculateDistanceKm_DifferentCoordinates_ReturnsPositiveDistance()
+        {
+            double result = DistanceCalculator.CalculateDistanceKm(
+                43.7001, -79.4163,
+                43.7101, -79.4163
+            );
+
+            Assert.True(result > 0);
+        }
+
+        [Theory]
+        [InlineData(43.7001, -79.4163, 43.7001, -79.4163, true)]
+        [InlineData(43.7001, -79.4163, 43.7101, -79.4163, true)]
+        [InlineData(43.7001, -79.4163, 43.7501, -79.4163, false)]
+        public void CalculateDistanceKm_CheckThreeKilometreRadius(
+            double userLat,
+            double userLon,
+            double washroomLat,
+            double washroomLon,
+            bool expectedInsideRadius)
+        {
+            double distance = DistanceCalculator.CalculateDistanceKm(
+                userLat, userLon, washroomLat, washroomLon
+            );
+
+            Assert.Equal(expectedInsideRadius, distance <= 3);
+        }
+
+        [Fact]
+        public void CalculateDistanceKm_ReversedCoordinates_ReturnsSameDistance()
+        {
+            double first = DistanceCalculator.CalculateDistanceKm(
+                43.7001, -79.4163,
+                43.7101, -79.4263
+            );
+
+            double reversed = DistanceCalculator.CalculateDistanceKm(
+                43.7101, -79.4263,
+                43.7001, -79.4163
+            );
+
+            Assert.Equal(first, reversed, precision: 9);
+        }
+
+
     }
 }

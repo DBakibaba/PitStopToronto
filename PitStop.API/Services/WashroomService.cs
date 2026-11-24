@@ -21,13 +21,32 @@ public class WashroomService(PitStopDbContext dbContext)
         TimeZoneInfo torontoTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Toronto");
         DateTime torontoNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, torontoTimeZone);
         DayOfWeek today = torontoNow.DayOfWeek;
+        const double boundingBoxRadiusKm = 3.1;
+        double latitudeOffset = boundingBoxRadiusKm / 111.0;
+        double minLatitude = latitude - latitudeOffset;
+        double maxLatitude = latitude + latitudeOffset;
+
+        double longitudeOffset =
+            boundingBoxRadiusKm / (111.0 * Math.Cos(latitude * Math.PI / 180.0));
+
+        double minLongitude = longitude - longitudeOffset;
+        double maxLongitude = longitude + longitudeOffset;
 
         var stopwatch = Stopwatch.StartNew();
-        var activeWashrooms = await dbContext.Washrooms.AsNoTracking().Where(washroom => washroom.IsActive).Include(washroom => washroom.OperatingHours).ToListAsync(cancellationToken);
+
+        var activeWashrooms = await dbContext.Washrooms.AsNoTracking()
+     .Where(washroom => washroom.IsActive)
+     .Where(washroom =>
+         washroom.Latitude >= minLatitude &&
+         washroom.Latitude <= maxLatitude)
+     .Where(washroom =>
+         washroom.Longitude >= minLongitude &&
+         washroom.Longitude <= maxLongitude).Include(washroom => washroom.OperatingHours).ToListAsync(cancellationToken);
+
         stopwatch.Stop();
 
         Console.WriteLine(
-             $"GetNearByAsync database query: {stopwatch.ElapsedMilliseconds} ms");
+            $"GetNearByAsync database query: {stopwatch.ElapsedMilliseconds} ms");
 
         var availableWashrooms = activeWashrooms.Where(washroom => IsAvailableNow(washroom));
         if (type.HasValue)
@@ -37,7 +56,7 @@ public class WashroomService(PitStopDbContext dbContext)
 
         var washroomsWithDistance = availableWashrooms.Select(washroom =>
         {
-            var distance = CalculateDistanceKm(
+            var distance = DistanceCalculator.CalculateDistanceKm(
              latitude, longitude,
              washroom.Latitude, washroom.Longitude
             );
@@ -88,9 +107,6 @@ public class WashroomService(PitStopDbContext dbContext)
             return false;
         }
 
-        
-
-
             TimeOnly currentTime = TimeOnly.FromDateTime(torontoNow);
 
         if (todayOperatingHour.CloseTime > todayOperatingHour.OpenTime)
@@ -109,30 +125,6 @@ public class WashroomService(PitStopDbContext dbContext)
         }
 
         return false; 
-        
-    }
-    private static double CalculateDistanceKm(double userLatitude, double userLongitude, double washroomLatitude, double washroomLongitude)
-    {
-        const double EarthRadiusKm = 6371;
-
-        var userLatRad = userLatitude * Math.PI / 180;
-        var washroomLatRad = washroomLatitude * Math.PI / 180;
-
-
-        var deltaLat = (washroomLatitude - userLatitude) * Math.PI / 180;
-        var deltaLon = (washroomLongitude - userLongitude) * Math.PI / 180;
-        var a =
-            Math.Sin(deltaLat / 2) * Math.Sin(deltaLat / 2) +
-            Math.Cos(userLatRad) * Math.Cos(washroomLatRad) *
-            Math.Sin(deltaLon / 2) * Math.Sin(deltaLon / 2);
-
-        var c = 2 * Math.Atan2(
-            Math.Sqrt(a),
-            Math.Sqrt(1 - a)
-        );
-
-        return EarthRadiusKm * c;
-
     }
 
     private static string BuildHoursText(Washroom washroom,DayOfWeek today)
