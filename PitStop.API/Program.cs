@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddProblemDetails();
 
 builder.Services.AddOpenApi();
 var connectionString =
@@ -55,6 +56,8 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 app.UseCors("Frontend");
 app.UseRateLimiter();
 app.MapWashroomEndpoints();
