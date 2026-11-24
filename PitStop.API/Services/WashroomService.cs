@@ -86,6 +86,11 @@ public class WashroomService(PitStopDbContext dbContext)
     }
     private bool IsAvailableNow(Washroom washroom)
     {
+        if (washroom.Status == FacilityStatus.Closed)
+        {
+            return false;
+        }
+
         if (washroom.OperatingHours.Count == 0)
         {
             return true;
