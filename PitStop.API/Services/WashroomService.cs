@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PitStop.API.Data;
 using PitStop.API.Dtos;
 using PitStop.API.Models;
+using System.Diagnostics;
 
 namespace PitStop.API.Services;
 
@@ -13,7 +14,7 @@ public class WashroomService(PitStopDbContext dbContext)
         return await dbContext.Washrooms.Include(w=>w.OperatingHours).ToListAsync();
 
     }
-    public async Task<List<NearbyWashroomDto>> GetNearByAsync(double latitude, double longitude,LocationType? type)
+    public async Task<List<NearbyWashroomDto>> GetNearByAsync(double latitude, double longitude,LocationType? type,CancellationToken cancellationToken)
 
 
     {
@@ -21,7 +22,12 @@ public class WashroomService(PitStopDbContext dbContext)
         DateTime torontoNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, torontoTimeZone);
         DayOfWeek today = torontoNow.DayOfWeek;
 
-        var activeWashrooms = await dbContext.Washrooms.Where(washroom => washroom.IsActive).Include(washroom => washroom.OperatingHours).ToListAsync();
+        var stopwatch = Stopwatch.StartNew();
+        var activeWashrooms = await dbContext.Washrooms.AsNoTracking().Where(washroom => washroom.IsActive).Include(washroom => washroom.OperatingHours).ToListAsync(cancellationToken);
+        stopwatch.Stop();
+
+        Console.WriteLine(
+             $"GetNearByAsync database query: {stopwatch.ElapsedMilliseconds} ms");
 
         var availableWashrooms = activeWashrooms.Where(washroom => IsAvailableNow(washroom));
         if (type.HasValue)

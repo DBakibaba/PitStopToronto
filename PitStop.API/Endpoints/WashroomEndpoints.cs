@@ -26,7 +26,7 @@ public static class WashroomEndpoints
 
 
 
-        group.MapGet("/nearby", async (double latitude, double longitude, LocationType? type, WashroomService washroomService) =>
+        group.MapGet("/nearby", async (double latitude, double longitude, LocationType? type, WashroomService washroomService,CancellationToken cancellationToken) =>
         {
 
             if (latitude < -90 || latitude > 90)
@@ -41,7 +41,7 @@ public static class WashroomEndpoints
             var nearbyWashrooms = await washroomService.GetNearByAsync(
                  latitude,
                  longitude,
-                 type
+                 type,cancellationToken
             );
 
             return Results.Ok(nearbyWashrooms);
